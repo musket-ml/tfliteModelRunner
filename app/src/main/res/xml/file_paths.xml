@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<paths>
+    <external-path
+        name="camera_images"
+        path="Android/data/com.onpositive.dldemos/files/Pictures" />
+    <external-path
+        name="camera_videos"
+        path="Android/data/com.onpositive.dldemos/files/Movies" />
+</paths>

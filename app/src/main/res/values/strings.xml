@@ -1,0 +1,17 @@
+<resources>
+    <string name="app_name">DLDemos</string>
+    <string name="calculating">Calculating...</string>
+    <string name="cancel">Cancel</string>
+    <string name="select">Select tflite file</string>
+    <string name="canceling">Canceling...</string>
+    <string name="segmentation_status">Processed %1$d\%%\nExpected time: %2$d min.</string>
+    <string name="delete">Delete</string>
+    <string name="add_new">Add</string>
+    <string name="segmentation">Segmentation</string>
+    <string name="tflite_fragment_info">On this tab you can add your tflite file for image processing.</string>
+    <string name="tflite_add_one_info">Please enter a title.</string>
+    <string name="tflite_add_two_info">Please click the button below and select the tflite file.</string>
+    <string name="tflite_add_empty_title_msg">Please enter a title.</string>
+    <string name="tflite_add_wrong_msg">Invalid file type. Please select a tflite file.</string>
+    <string name="tflite_add_downloading">Downloading TFLite file.</string>
+</resources>
