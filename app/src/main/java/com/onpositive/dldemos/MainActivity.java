@@ -512,6 +512,8 @@ public class MainActivity extends AppCompatActivity {
         @Override
         protected void onPostExecute(Void v) {
             fragment.showDownloading(false);
+            ((MainActivity) fragment.getActivity()).mSectionsPagerAdapter.refreshDataSet();
+            ((MainActivity) fragment.getActivity()).mSectionsPagerAdapter.notifyDataSetChanged();
         }
 
         private void downloadFile(Uri uri) {
@@ -582,6 +584,10 @@ public class MainActivity extends AppCompatActivity {
                 return tfLiteItems.get(position - 1).getTitle();
             } else
                 return null;
+        }
+
+        public void refreshDataSet() {
+            tfLiteItems = tfLiteItemDao.getAll();
         }
     }
 }
