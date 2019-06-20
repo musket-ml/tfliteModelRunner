@@ -6,6 +6,7 @@ import android.graphics.Matrix;
 
 import com.onpositive.dldemos.ProgressEvent;
 import com.onpositive.dldemos.ProgressListener;
+import com.onpositive.dldemos.data.TFLiteItem;
 
 import org.jcodec.api.FrameGrab;
 import org.jcodec.api.JCodecException;
@@ -24,12 +25,12 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 import java.util.concurrent.ThreadPoolExecutor;
 
-public abstract class VideoSegmentator extends ImageSegmentator {
+public class VideoSegmentator extends ImageSegmentator {
 
     private ProgressListener progressListener;
 
-    public VideoSegmentator(Activity activity) throws IOException {
-        super(activity);
+    public VideoSegmentator(Activity activity, TFLiteItem tfLiteItem) throws IOException {
+        super(activity, tfLiteItem);
     }
 
     public String getSegmentedVideoPath(String videoFilePath) {

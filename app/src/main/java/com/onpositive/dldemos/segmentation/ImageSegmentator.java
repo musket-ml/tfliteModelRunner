@@ -8,9 +8,11 @@ import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Matrix;
+import android.support.annotation.NonNull;
 import android.support.v4.content.ContextCompat;
 
 import com.onpositive.dldemos.R;
+import com.onpositive.dldemos.data.TFLiteItem;
 import com.onpositive.dldemos.tools.Logger;
 
 import org.tensorflow.lite.Delegate;
@@ -26,26 +28,25 @@ import java.util.ArrayList;
 import java.util.List;
 
 public abstract class ImageSegmentator implements Segmentator {
-    private MappedByteBuffer tfliteModel;
-    private final Interpreter.Options tfliteOptions = new Interpreter.Options();
-    protected volatile Interpreter interpreter;
-    private Delegate gpuDelegate = null;
-
-    private Activity activity;
-
-    private int batchSize = 1;
     private static final int INPUT_SIZE_X = 320;
     private static final int INPUT_SIZE_Y = 320;
     private static final int OUTPUT_SIZE_X = 320;
     private static final int OUTPUT_SIZE_Y = 320;
     private static final int PIXEL_SIZE = 3;
     private static final double GOOD_PROB_THRESHOLD = 0.5;
-
+    private final Interpreter.Options tfliteOptions = new Interpreter.Options();
+    protected volatile Interpreter interpreter;
     protected Logger log = new Logger(this.getClass());
+    private MappedByteBuffer tfliteModel;
+    private Delegate gpuDelegate = null;
+    private Activity activity;
+    private int batchSize = 1;
+    private TFLiteItem tfLiteItem;
 
-    public ImageSegmentator(Activity activity) throws IOException {
+    public ImageSegmentator(Activity activity, @NonNull TFLiteItem tfLiteItem) throws IOException {
         this.activity = activity;
-        this.tfliteModel = loadModelFile(activity.getAssets(), getModelPath());
+        this.tfLiteItem = tfLiteItem;
+        this.tfliteModel = loadModelFile(activity.getAssets(), tfLiteItem);
         interpreter = new Interpreter(tfliteModel, tfliteOptions);
 
         log.log(this.getClass().getSimpleName() + " initialized.");
@@ -102,14 +103,23 @@ public abstract class ImageSegmentator implements Segmentator {
     /**
      * Memory-map model file from Assets.
      */
-    private MappedByteBuffer loadModelFile(AssetManager assetManager, String modelPath) throws IOException {
-        AssetFileDescriptor fileDescriptor = assetManager.openFd(modelPath);
-        FileInputStream inputStream = new FileInputStream(fileDescriptor.getFileDescriptor());
-        FileChannel fileChannel = inputStream.getChannel();
-        long startOffset = fileDescriptor.getStartOffset();
-        long declaredLength = fileDescriptor.getDeclaredLength();
-        log.info("Model: " + modelPath + " loaded");
-        return fileChannel.map(FileChannel.MapMode.READ_ONLY, startOffset, declaredLength);
+    private MappedByteBuffer loadModelFile(AssetManager assetManager, TFLiteItem model) throws IOException {
+        MappedByteBuffer byteBuffer;
+        FileInputStream inputStream;
+        if (model.isAsset()) {
+            AssetFileDescriptor fileDescriptor = assetManager.openFd(model.getTfFilePath());
+            inputStream = new FileInputStream(fileDescriptor.getFileDescriptor());
+            long startOffset = fileDescriptor.getStartOffset();
+            long declaredLength = fileDescriptor.getDeclaredLength();
+            FileChannel fileChannel = inputStream.getChannel();
+            byteBuffer = fileChannel.map(FileChannel.MapMode.READ_ONLY, startOffset, declaredLength);
+        } else {
+            inputStream = new FileInputStream(model.getTfFilePath());
+            FileChannel fileChannel = inputStream.getChannel();
+            byteBuffer = fileChannel.map(FileChannel.MapMode.READ_ONLY, 0, fileChannel.size());
+        }
+        log.info("Model: " + model.getTfFilePath() + " loaded");
+        return byteBuffer;
     }
 
     /**
@@ -215,5 +225,4 @@ public abstract class ImageSegmentator implements Segmentator {
         log.log("NNAPI enabled");
     }
 
-    protected abstract String getModelPath();
 }

@@ -34,8 +34,8 @@ import com.onpositive.dldemos.data.ResultItem;
 import com.onpositive.dldemos.data.ResultItemDao;
 import com.onpositive.dldemos.data.TFLiteItem;
 import com.onpositive.dldemos.data.TFLiteItemDao;
-import com.onpositive.dldemos.segmentation.HumanSegmentator;
 import com.onpositive.dldemos.segmentation.Segmentator;
+import com.onpositive.dldemos.segmentation.VideoSegmentator;
 import com.onpositive.dldemos.tools.Logger;
 import com.onpositive.dldemos.tools.Utils;
 
@@ -55,8 +55,6 @@ import butterknife.OnClick;
 
 public class MainActivity extends AppCompatActivity {
 
-    @Nullable
-    private static Segmentator humanSegmentator;
     private static String currentPhotoPath;
     private static String currentVideoPath;
     @BindView(R.id.tabs)
@@ -75,11 +73,10 @@ public class MainActivity extends AppCompatActivity {
         mSectionsPagerAdapter = new SectionsPagerAdapter(getSupportFragmentManager());
         mViewPager.setAdapter(mSectionsPagerAdapter);
         tabLayout.setupWithViewPager(mViewPager);
-        //TODO add camera
-        //TODO test app with batch 10 images
-        //TODO add image series from camera
-        //TODO add tflite updater
-        //TODO RV item remove
+        //TODO fix progress showing
+        //TODO model properties image size(input/output)
+        //TODO fragment model for image classification(find test model for this task)
+        //TODO remove models tabs
         log.log("onCreate executed");
     }
 
@@ -258,7 +255,6 @@ public class MainActivity extends AppCompatActivity {
                 Collections.reverse(segResultList);
                 segRvAdapter = new RecyclerViewAdapter(this.getContext(), segResultList);
                 segmentationRV.setAdapter(segRvAdapter);
-                humanSegmentator = new HumanSegmentator(this.getActivity());
             } catch (Exception e) {
                 log.error("Segmentation initialization failed:\n" + e.getMessage());
             }
@@ -269,7 +265,13 @@ public class MainActivity extends AppCompatActivity {
         @Override
         public void onActivityResult(int requestCode, int resultCode, Intent data) {
             super.onActivityResult(requestCode, resultCode, data);
-            sat = new SegmentationAsyncTask(this);
+            Segmentator segmentator = null;
+            try {
+                segmentator = new VideoSegmentator(this.getActivity(), tfLiteItem);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+            sat = new SegmentationAsyncTask(segmentator, this);
             if (resultCode != RESULT_OK) {
                 log.log("onActivityResult failed");
                 return;
@@ -365,8 +367,11 @@ public class MainActivity extends AppCompatActivity {
         ContentType contentType;
         private boolean isCanceled = false;
         private SegmentationFragment fragment;
+        @Nullable
+        private Segmentator segmentator;
 
-        public SegmentationAsyncTask(SegmentationFragment fragment) {
+        public SegmentationAsyncTask(Segmentator segmentator, SegmentationFragment fragment) {
+            this.segmentator = segmentator;
             this.fragment = fragment;
         }
 
@@ -379,7 +384,7 @@ public class MainActivity extends AppCompatActivity {
                     try {
                         resultImageFile = Utils.createImageFile(fragment.getActivity());
                         FileOutputStream stream = new FileOutputStream(resultImageFile);
-                        humanSegmentator.getSegmentedImage(currentPhotoPath)
+                        segmentator.getSegmentedImage(currentPhotoPath)
                                 .compress(Bitmap.CompressFormat.JPEG, 100, stream);
                         stream.flush();
                         stream.close();
@@ -394,14 +399,14 @@ public class MainActivity extends AppCompatActivity {
                 case VIDEO:
                     contentType = ContentType.VIDEO;
                     try {
-                        assert humanSegmentator != null;
-                        humanSegmentator.setProgressListener(new ProgressListener() {
+                        assert segmentator != null;
+                        segmentator.setProgressListener(new ProgressListener() {
                             public void updateProgress(ProgressEvent progressEvent) {
                                 progressEvent.setCanceled(isCanceled);
                                 publishProgress(progressEvent.getProgressInPercent(), progressEvent.getExpectedMinutes());
                             }
                         });
-                        String segmentedVideoPath = humanSegmentator.getSegmentedVideoPath(currentVideoPath);
+                        String segmentedVideoPath = segmentator.getSegmentedVideoPath(currentVideoPath);
                         if (isCanceled) {
                             log.log("Segmentation canceled. Segmented video was deleted. Is file exist: " + new File(segmentedVideoPath).exists());
                         } else {
@@ -549,6 +554,7 @@ public class MainActivity extends AppCompatActivity {
         private AppDatabase db;
         private TFLiteItemDao tfLiteItemDao;
         private List<TFLiteItem> tfLiteItems;
+        private boolean hasTFLadd = false;
 
         public SectionsPagerAdapter(FragmentManager fm) {
             super(fm);
@@ -559,29 +565,28 @@ public class MainActivity extends AppCompatActivity {
 
         @Override
         public Fragment getItem(int position) {
-            if (position + 1 == getCount()) {
+            if (position + 1 == getCount() && !hasTFLadd) {
+                hasTFLadd = true;
                 log.log("Loaded fragment for adding a tflite file");
-                return TFliteAddFragment.newInstance(position + 1);
-            } else if (position == 0) {
-                return SegmentationFragment.newInstance(
-                        new TFLiteItem("embedded", getApplicationContext().getString(R.string.segmentation)), position + 1);
-            } else
-                return SegmentationFragment.newInstance(tfLiteItems.get(position - 1), position + 1);
+                return TFliteAddFragment.newInstance(position);
+            } else if (position + 1 == getCount() && hasTFLadd) {
+                return SegmentationFragment.newInstance(tfLiteItems.get(position - 1), position);
+            } else {
+                return SegmentationFragment.newInstance(tfLiteItems.get(position), position);
+            }
         }
 
         @Override
         public int getCount() {
-            return tfLiteItems.size() + 2;
+            return tfLiteItems.size() + 1;
         }
 
         @Override
         public CharSequence getPageTitle(int position) {
-            if (position == 0) {
-                return getResources().getString(R.string.segmentation);
+            if (position < getCount() - 1) {
+                return tfLiteItems.get(position).getTitle();
             } else if (position == getCount() - 1) {
                 return getResources().getString(R.string.add_new);
-            } else if (position > 0 && position < getCount() - 1) {
-                return tfLiteItems.get(position - 1).getTitle();
             } else
                 return null;
         }
