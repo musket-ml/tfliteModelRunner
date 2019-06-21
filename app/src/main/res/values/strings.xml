@@ -14,4 +14,8 @@
     <string name="tflite_add_empty_title_msg">Please enter a title.</string>
     <string name="tflite_add_wrong_msg">Invalid file type. Please select a tflite file.</string>
     <string name="tflite_add_downloading">Downloading TFLite file.</string>
+    <string name="remove_current_tab">Remove current tab</string>
+    <string name="remove_alert_title">Delete Tensorflow lite model?</string>
+    <string name="remove_alert_message">This action remove TF Lite model with all results!</string>
+    <string name="yes">Yes</string>
 </resources>

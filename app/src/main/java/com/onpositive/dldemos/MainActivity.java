@@ -1,6 +1,7 @@
 package com.onpositive.dldemos;
 
 import android.Manifest;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
@@ -15,11 +16,15 @@ import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.content.FileProvider;
 import android.support.v4.view.ViewPager;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
@@ -241,6 +246,29 @@ public class MainActivity extends AppCompatActivity {
         }
 
         @Override
+        public void onCreate(@Nullable Bundle savedInstanceState) {
+            super.onCreate(savedInstanceState);
+            setHasOptionsMenu(true);
+        }
+
+        @Override
+        public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+            inflater.inflate(R.menu.model_fragment_menu, menu);
+            super.onCreateOptionsMenu(menu, inflater);
+        }
+
+        @Override
+        public boolean onOptionsItemSelected(MenuItem item) {
+            switch (item.getItemId()) {
+                case R.id.remove_current_tab:
+                    showRemoveModelDialog();
+                    return true;
+                default:
+                    return super.onOptionsItemSelected(item);
+            }
+        }
+
+        @Override
         public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
             View rootView = inflater.inflate(R.layout.fragment_segmentation, container, false);
             ButterKnife.bind(this, rootView);
@@ -357,6 +385,51 @@ public class MainActivity extends AppCompatActivity {
             if (takePictureIntent.resolveActivity(getActivity().getPackageManager()) != null) {
                 startActivityForResult(takePictureIntent, REQUEST_IMAGE_CAPTURE);
             }
+        }
+
+        private void showRemoveModelDialog() {
+            new AlertDialog.Builder(this.getActivity())
+                    .setTitle(getResources().getString(R.string.remove_alert_title))
+                    .setMessage(
+                            getResources().getString(R.string.remove_alert_message))
+                    .setPositiveButton(
+                            getResources().getString(R.string.yes),
+                            new DialogInterface.OnClickListener() {
+
+                                @Override
+                                public void onClick(DialogInterface dialog,
+                                                    int which) {
+                                    removeModel(tfLiteItem);
+                                }
+                            })
+                    .setNegativeButton(
+                            getResources().getString(R.string.cancel),
+                            new DialogInterface.OnClickListener() {
+
+                                @Override
+                                public void onClick(DialogInterface dialog,
+                                                    int which) {
+                                }
+                            }).show();
+        }
+
+        private void removeModel(TFLiteItem tfLiteItem) {
+            List<ResultItem> segmentItemList = MLDemoApp.getInstance().getDatabase().resultItemDao()
+                    .getAllByParentTF(tfLiteItem.getTfFilePath());
+            for (ResultItem resultItem : segmentItemList) {
+                File resultItemFile = new File(resultItem.getFilePath());
+                if (resultItemFile.exists())
+                    resultItemFile.delete();
+                MLDemoApp.getInstance().getDatabase().resultItemDao().delete(resultItem);
+            }
+
+            File modelFile = new File(tfLiteItem.getTfFilePath());
+            if (modelFile.exists())
+                modelFile.delete();
+            MLDemoApp.getInstance().getDatabase().tfLiteItemDao().delete(tfLiteItem);
+
+            ((MainActivity) getActivity()).mSectionsPagerAdapter.refreshDataSet();
+            ((MainActivity) getActivity()).mSectionsPagerAdapter.notifyDataSetChanged();
         }
     }
 
