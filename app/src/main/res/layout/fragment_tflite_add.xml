@@ -8,18 +8,6 @@
     tools:context=".MainActivity$TFliteAddFragment">
 
 
-    <Button
-        android:id="@+id/btn_tf_select"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="8dp"
-        android:layout_marginTop="8dp"
-        android:layout_marginEnd="8dp"
-        android:text="@string/select"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/tflite_add_two_info" />
-
     <TextView
         android:id="@+id/fragment_info"
         android:layout_width="0dp"
@@ -28,10 +16,55 @@
         android:layout_marginTop="8dp"
         android:layout_marginEnd="8dp"
         android:text="@string/tflite_fragment_info"
-        android:textSize="24sp"
+        android:textSize="20sp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
+
+    <TextView
+        android:id="@+id/tflite_add_type_info"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="8dp"
+        android:layout_marginEnd="8dp"
+        android:text="@string/tflite_add_type_info"
+        android:textSize="16sp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/fragment_info" />
+
+    <RadioGroup
+        android:id="@+id/model_type_rg"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="8dp"
+        android:layout_marginEnd="8dp"
+        android:orientation="horizontal"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/tflite_add_type_info">
+
+        <RadioButton
+            android:id="@+id/segmentation_rb"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="@string/segmentation"
+            android:layout_marginRight="8dp"
+            android:layout_marginLeft="0dp"
+            android:layout_marginTop="0dp"
+            android:layout_marginBottom="0dp" />
+
+        <RadioButton
+            android:id="@+id/classification_rb"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="@string/classification" />
+
+    </RadioGroup>
 
     <TextView
         android:id="@+id/tflite_add_one_info"
@@ -39,10 +72,12 @@
         android:layout_height="wrap_content"
         android:layout_marginStart="8dp"
         android:layout_marginTop="8dp"
+        android:layout_marginEnd="8dp"
         android:text="@string/tflite_add_one_info"
-        android:textSize="24sp"
+        android:textSize="16sp"
+        app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/fragment_info" />
+        app:layout_constraintTop_toBottomOf="@+id/model_type_rg" />
 
     <EditText
         android:id="@+id/tflite_add_title"
@@ -56,7 +91,8 @@
         android:text=""
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/tflite_add_one_info" />
+        app:layout_constraintTop_toBottomOf="@+id/tflite_add_one_info"
+        android:autofillHints="" />
 
     <TextView
         android:id="@+id/tflite_add_two_info"
@@ -66,10 +102,35 @@
         android:layout_marginTop="8dp"
         android:layout_marginEnd="8dp"
         android:text="@string/tflite_add_two_info"
-        android:textSize="24sp"
+        android:textSize="16sp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/size_x" />
+
+    <TextView
+        android:id="@+id/tflite_add_three_info"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="8dp"
+        android:layout_marginEnd="8dp"
+        android:text="@string/tflite_add_three_info"
+        android:textSize="16sp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/tflite_add_title" />
+
+    <Button
+        android:id="@+id/btn_tf_select"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="8dp"
+        android:layout_marginEnd="8dp"
+        android:text="@string/select"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/tflite_add_two_info" />
 
     <TextView
         android:id="@+id/tflite_add_status"
@@ -79,7 +140,7 @@
         android:layout_marginTop="8dp"
         android:text=""
         android:visibility="invisible"
-        android:textSize="24sp"
+        android:textSize="16sp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/tflite_progress_bar" />
@@ -97,5 +158,39 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/btn_tf_select" />
+
+    <EditText
+        android:id="@+id/size_x"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="8dp"
+        android:layout_marginEnd="4dp"
+        android:ems="10"
+        android:hint="@string/label_x"
+        android:imeActionLabel="@string/label_y"
+        android:inputType="numberSigned"
+        app:layout_constraintEnd_toStartOf="@+id/size_y"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/tflite_add_three_info"
+        android:autofillHints="" />
+
+    <EditText
+        android:id="@+id/size_y"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="4dp"
+        android:layout_marginTop="8dp"
+        android:layout_marginEnd="8dp"
+        android:layout_marginBottom="8dp"
+        android:ems="10"
+        android:hint="@string/label_y"
+        android:inputType="numberSigned"
+        app:layout_constraintBottom_toTopOf="@+id/tflite_add_two_info"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@+id/size_x"
+        app:layout_constraintTop_toBottomOf="@+id/tflite_add_three_info"
+        app:layout_constraintVertical_bias="0.0"
+        android:autofillHints="" />
 
 </android.support.constraint.ConstraintLayout>

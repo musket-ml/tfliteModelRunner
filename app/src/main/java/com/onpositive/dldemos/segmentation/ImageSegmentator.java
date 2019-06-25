@@ -28,10 +28,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 public abstract class ImageSegmentator implements Segmentator {
-    private static final int INPUT_SIZE_X = 320;
-    private static final int INPUT_SIZE_Y = 320;
-    private static final int OUTPUT_SIZE_X = 320;
-    private static final int OUTPUT_SIZE_Y = 320;
+    private static int SIZE_X;
+    private static int SIZE_Y;
     private static final int PIXEL_SIZE = 3;
     private static final double GOOD_PROB_THRESHOLD = 0.5;
     private final Interpreter.Options tfliteOptions = new Interpreter.Options();
@@ -46,6 +44,8 @@ public abstract class ImageSegmentator implements Segmentator {
     public ImageSegmentator(Activity activity, @NonNull TFLiteItem tfLiteItem) throws IOException {
         this.activity = activity;
         this.tfLiteItem = tfLiteItem;
+        SIZE_X = tfLiteItem.getSize_x();
+        SIZE_Y = tfLiteItem.getSize_y();
         this.tfliteModel = loadModelFile(activity.getAssets(), tfLiteItem);
         interpreter = new Interpreter(tfliteModel, tfliteOptions);
 
@@ -82,8 +82,8 @@ public abstract class ImageSegmentator implements Segmentator {
     public List<Bitmap> getSegmentationMaskList(List<Bitmap> inputImagesList) {
         batchSize = inputImagesList.size();
         List<Bitmap> resizedImagesList = scaleBitmaps(inputImagesList);
-        ByteBuffer segmentationMaskBB = ByteBuffer.allocate(INPUT_SIZE_X * INPUT_SIZE_Y * 4 * batchSize);
-        int[] dimensions = {batchSize, INPUT_SIZE_X, INPUT_SIZE_Y, PIXEL_SIZE};
+        ByteBuffer segmentationMaskBB = ByteBuffer.allocate(SIZE_X * SIZE_Y * 4 * batchSize);
+        int[] dimensions = {batchSize, SIZE_X, SIZE_Y, PIXEL_SIZE};
         interpreter.resizeInput(0, dimensions);
         interpreter.run(convertBitmapListToByteBuffer(resizedImagesList), segmentationMaskBB);
         log.log("Interpreter returned segmentation mask prediction");
@@ -93,7 +93,7 @@ public abstract class ImageSegmentator implements Segmentator {
     public List<Bitmap> scaleBitmaps(List<Bitmap> inputImagesList) {
         List<Bitmap> scaledBitmapsList = new ArrayList<>();
         for (Bitmap bitmap : inputImagesList) {
-            Bitmap resizedImage = Bitmap.createScaledBitmap(bitmap, INPUT_SIZE_X, INPUT_SIZE_Y, true);
+            Bitmap resizedImage = Bitmap.createScaledBitmap(bitmap, SIZE_X, SIZE_Y, true);
             scaledBitmapsList.add(resizedImage);
         }
         log.log("Input images are scaled for the Interpreter input");
@@ -132,16 +132,16 @@ public abstract class ImageSegmentator implements Segmentator {
         List<Bitmap> bitmapMaskList = new ArrayList<>();
         byteBuffer.rewind();
         byteBuffer.order(ByteOrder.nativeOrder());
-        int[] pixels = new int[OUTPUT_SIZE_X * OUTPUT_SIZE_Y];
+        int[] pixels = new int[SIZE_X * SIZE_Y];
         int maskColor = ContextCompat.getColor(activity.getApplicationContext(), R.color.segmentationMask);
         for (int c = 0; c < batchSize; c++) {
-            for (int i = 0; i < OUTPUT_SIZE_X * OUTPUT_SIZE_Y; i++)
+            for (int i = 0; i < SIZE_X * SIZE_Y; i++)
                 if (byteBuffer.getFloat() > GOOD_PROB_THRESHOLD)
                     pixels[i] = maskColor;
                 else
                     pixels[i] = Color.argb(0, 0, 0, 0);
-            Bitmap bitmap = Bitmap.createBitmap(OUTPUT_SIZE_X, OUTPUT_SIZE_Y, Bitmap.Config.ARGB_4444);
-            bitmap.setPixels(pixels, 0, OUTPUT_SIZE_X, 0, 0, OUTPUT_SIZE_X, OUTPUT_SIZE_Y);
+            Bitmap bitmap = Bitmap.createBitmap(SIZE_X, SIZE_Y, Bitmap.Config.ARGB_4444);
+            bitmap.setPixels(pixels, 0, SIZE_X, 0, 0, SIZE_X, SIZE_Y);
 
             Bitmap segmentationMask = Bitmap.createScaledBitmap(bitmap, width, height, true);
             bitmapMaskList.add(segmentationMask);
@@ -151,15 +151,15 @@ public abstract class ImageSegmentator implements Segmentator {
     }
 
     private ByteBuffer convertBitmapListToByteBuffer(List<Bitmap> bitmapList) {
-        ByteBuffer byteBuffer = ByteBuffer.allocateDirect(4 * batchSize * INPUT_SIZE_X * INPUT_SIZE_Y * PIXEL_SIZE);
+        ByteBuffer byteBuffer = ByteBuffer.allocateDirect(4 * batchSize * SIZE_X * SIZE_Y * PIXEL_SIZE);
         byteBuffer.order(ByteOrder.nativeOrder());
-        int[] intValues = new int[INPUT_SIZE_X * INPUT_SIZE_Y];
+        int[] intValues = new int[SIZE_X * SIZE_Y];
         try {
             for (Bitmap bitmap : bitmapList) {
                 bitmap.getPixels(intValues, 0, bitmap.getWidth(), 0, 0, bitmap.getWidth(), bitmap.getHeight());
                 int pixel = 0;
-                for (int i = 0; i < INPUT_SIZE_X; ++i) {
-                    for (int j = 0; j < INPUT_SIZE_Y; ++j) {
+                for (int i = 0; i < SIZE_X; ++i) {
+                    for (int j = 0; j < SIZE_Y; ++j) {
                         final int val = intValues[pixel++];
                         byteBuffer.putFloat((val >> 16) & 0xFF);
                         byteBuffer.putFloat((val >> 8) & 0xFF);

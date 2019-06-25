@@ -21,6 +21,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.text.Editable;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -29,6 +30,8 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.ProgressBar;
+import android.widget.RadioButton;
+import android.widget.RadioGroup;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -39,6 +42,7 @@ import com.onpositive.dldemos.data.ResultItem;
 import com.onpositive.dldemos.data.ResultItemDao;
 import com.onpositive.dldemos.data.TFLiteItem;
 import com.onpositive.dldemos.data.TFLiteItemDao;
+import com.onpositive.dldemos.data.TFModelType;
 import com.onpositive.dldemos.segmentation.Segmentator;
 import com.onpositive.dldemos.segmentation.VideoSegmentator;
 import com.onpositive.dldemos.tools.Logger;
@@ -55,7 +59,11 @@ import java.util.List;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import butterknife.OnCheckedChanged;
 import butterknife.OnClick;
+import butterknife.OnTextChanged;
+
+import static butterknife.OnTextChanged.Callback.AFTER_TEXT_CHANGED;
 
 
 public class MainActivity extends AppCompatActivity {
@@ -96,6 +104,12 @@ public class MainActivity extends AppCompatActivity {
         private static final int READ_REQUEST_CODE = 5;
         @BindView(R.id.tflite_add_title)
         TextView tfliteAddTitelTV;
+        @BindView(R.id.model_type_rg)
+        RadioGroup modelTypeRG;
+        @BindView(R.id.size_x)
+        TextView modelInputWidth;
+        @BindView(R.id.size_y)
+        TextView modelInputHeight;
         @BindView(R.id.btn_tf_select)
         Button btnTFSelect;
         @BindView(R.id.tflite_progress_bar)
@@ -103,10 +117,13 @@ public class MainActivity extends AppCompatActivity {
         @BindView(R.id.tflite_add_status)
         TextView tfliteAddStatus;
         TFLiteDownloaderAT tfldat;
-        private Logger logger = new Logger(this.getClass());
+        private TFModelType tfModelType = null;
+        private int size_x = 0;
+        private int size_y = 0;
 
         public TFliteAddFragment() {
         }
+        private Logger logger = new Logger(this.getClass());
 
         /**
          * Returns a new instance of this fragment for the given section
@@ -121,15 +138,54 @@ public class MainActivity extends AppCompatActivity {
             return fragment;
         }
 
+        @OnCheckedChanged({R.id.segmentation_rb, R.id.classification_rb})
+        public void onRadioButtonCheckChanged(RadioButton radioButton, boolean checked) {
+            if (checked) {
+                switch (radioButton.getId()) {
+                    case R.id.segmentation_rb:
+                        tfModelType = TFModelType.SEGMENTATION;
+                        break;
+                    case R.id.classification_rb:
+                        tfModelType = TFModelType.CLASSIFICATION;
+                        break;
+                }
+            }
+        }
+
+        @OnTextChanged(value = R.id.size_x, callback = AFTER_TEXT_CHANGED)
+        public void widthTextChanged(Editable s) {
+            if (!s.toString().isEmpty())
+                size_x = Integer.valueOf(s.toString());
+        }
+
+        @OnTextChanged(value = R.id.size_y, callback = AFTER_TEXT_CHANGED)
+        public void heightTextChanged(Editable s) {
+            if (!s.toString().isEmpty())
+                size_y = Integer.valueOf(s.toString());
+        }
+
         @OnClick(R.id.btn_tf_select)
         public void onClick(View view) {
             switch (view.getId()) {
                 case R.id.btn_tf_select:
+                    String errMsg = "";
+                    boolean hasErr = false;
                     if (tfliteAddTitelTV.getText().length() < 1) {
-                        Toast.makeText(getContext(), R.string.tflite_add_empty_title_msg, Toast.LENGTH_LONG).show();
+                        errMsg += getContext().getString(R.string.tflite_add_empty_title_msg) + "\n";
+                        hasErr = true;
+                    }
+                    if (tfModelType == null) {
+                        errMsg += getContext().getString(R.string.tflite_add_empty_type_msg) + "\n";
+                        hasErr = true;
+                    }
+                    if (modelInputWidth.getText().length() < 1 || modelInputHeight.getText().length() < 1) {
+                        errMsg += getContext().getString(R.string.tflite_add_empty_size_msg) + "\n";
+                        hasErr = true;
+                    }
+                    if (hasErr) {
+                        Toast.makeText(getContext(), errMsg, Toast.LENGTH_LONG).show();
                         return;
                     }
-
                     logger.log("Select tflite button pressed.");
                     performFileSearch();
                     break;
@@ -610,7 +666,10 @@ public class MainActivity extends AppCompatActivity {
                 TFLiteItemDao tfLiteDao = MLDemoApp.getInstance().getDatabase().tfLiteItemDao();
                 tfLiteDao.insert(new TFLiteItem(
                         outFile.getAbsolutePath(),
-                        fragment.tfliteAddTitelTV.getText().toString()));
+                        fragment.tfliteAddTitelTV.getText().toString(),
+                        fragment.tfModelType,
+                        fragment.size_x,
+                        fragment.size_y));
                 logger.log("Downloaded file path: " + outFile);
             } catch (IOException e) {
                 logger.log("File downloading failed. Error: " + e);
