@@ -8,14 +8,21 @@
     <string name="delete">Delete</string>
     <string name="add_new">Add</string>
     <string name="segmentation">Segmentation</string>
+    <string name="classification">Classification</string>
     <string name="tflite_fragment_info">On this tab you can add your tflite file for image processing.</string>
     <string name="tflite_add_one_info">Please enter a title.</string>
     <string name="tflite_add_two_info">Please click the button below and select the tflite file.</string>
+    <string name="tflite_add_three_info">Please enter image width and height dimensions for model input.</string>
     <string name="tflite_add_empty_title_msg">Please enter a title.</string>
+    <string name="tflite_add_empty_type_msg">Please select a model type.</string>
+    <string name="tflite_add_empty_size_msg">Please enter a model input dimensions.</string>
     <string name="tflite_add_wrong_msg">Invalid file type. Please select a tflite file.</string>
     <string name="tflite_add_downloading">Downloading TFLite file.</string>
     <string name="remove_current_tab">Remove current tab</string>
     <string name="remove_alert_title">Delete Tensorflow lite model?</string>
     <string name="remove_alert_message">This action remove TF Lite model with all results!</string>
     <string name="yes">Yes</string>
+    <string name="tflite_add_type_info">Please select a model type</string>
+    <string name="label_x">Image width</string>
+    <string name="label_y">Image height</string>
 </resources>
