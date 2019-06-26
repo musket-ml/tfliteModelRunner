@@ -15,8 +15,8 @@ import com.onpositive.dldemos.R;
 import com.onpositive.dldemos.data.TFLiteItem;
 import com.onpositive.dldemos.tools.Logger;
 
-import org.tensorflow.lite.Delegate;
 import org.tensorflow.lite.Interpreter;
+import org.tensorflow.lite.gpu.GpuDelegate;
 
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -28,15 +28,15 @@ import java.util.ArrayList;
 import java.util.List;
 
 public abstract class ImageSegmentator implements Segmentator {
-    private static int SIZE_X;
-    private static int SIZE_Y;
     private static final int PIXEL_SIZE = 3;
     private static final double GOOD_PROB_THRESHOLD = 0.5;
+    private static int SIZE_X;
+    private static int SIZE_Y;
     private final Interpreter.Options tfliteOptions = new Interpreter.Options();
     protected volatile Interpreter interpreter;
     protected Logger log = new Logger(this.getClass());
     private MappedByteBuffer tfliteModel;
-    private Delegate gpuDelegate = null;
+    private GpuDelegate gpuDelegate = null;
     private Activity activity;
     private int batchSize = 1;
     private TFLiteItem tfLiteItem;
@@ -47,6 +47,8 @@ public abstract class ImageSegmentator implements Segmentator {
         SIZE_X = tfLiteItem.getSize_x();
         SIZE_Y = tfLiteItem.getSize_y();
         this.tfliteModel = loadModelFile(activity.getAssets(), tfLiteItem);
+        useGPU();
+        tfliteOptions.setNumThreads(Runtime.getRuntime().availableProcessors() + 1);
         interpreter = new Interpreter(tfliteModel, tfliteOptions);
 
         log.log(this.getClass().getSimpleName() + " initialized.");
@@ -184,10 +186,15 @@ public abstract class ImageSegmentator implements Segmentator {
     }
 
     public void close() {
-        interpreter.close();
-        interpreter = null;
+        if (interpreter != null) {
+            interpreter.close();
+            interpreter = null;
+        }
+        if (gpuDelegate != null) {
+            gpuDelegate.close();
+            gpuDelegate = null;
+        }
         tfliteModel = null;
-        log.log("Session closed");
     }
 
     private void recreateInterpreter() {
@@ -202,7 +209,7 @@ public abstract class ImageSegmentator implements Segmentator {
     public void useGPU() {
         if (gpuDelegate == null && GpuDelegateHelper.isGpuDelegateAvailable()) {
             try {
-                gpuDelegate = GpuDelegateHelper.createGpuDelegate();
+                gpuDelegate = new GpuDelegate();
                 tfliteOptions.addDelegate(gpuDelegate);
                 recreateInterpreter();
                 log.log("GPU enabled");
@@ -224,5 +231,4 @@ public abstract class ImageSegmentator implements Segmentator {
         recreateInterpreter();
         log.log("NNAPI enabled");
     }
-
 }
