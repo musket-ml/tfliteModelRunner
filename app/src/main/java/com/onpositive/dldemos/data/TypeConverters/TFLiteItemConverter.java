@@ -12,7 +12,7 @@ public class TFLiteItemConverter {
             case SEGMENTATION:
                 return "SEGMENTATION";
             case CLASSIFICATION:
-                return "SEGMENTATION";
+                return "CLASSIFICATION";
         }
         return null;
     }
