@@ -30,7 +30,7 @@ import java.util.PriorityQueue;
 
 public class ImageClassifier {
     private static final Logger log = new Logger(ImageClassifier.class);
-    private static final int MAX_RESULTS = 3;
+    private static final int MAX_RESULTS = 10;
     private static final int DIM_BATCH_SIZE = 1;
     private static final int DIM_PIXEL_SIZE = 3;
     private final Interpreter.Options tfliteOptions = new Interpreter.Options();
