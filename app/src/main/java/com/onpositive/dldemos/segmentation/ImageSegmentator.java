@@ -28,10 +28,10 @@ import java.util.ArrayList;
 import java.util.List;
 
 public abstract class ImageSegmentator implements Segmentator {
-    private static final int PIXEL_SIZE = 3;
-    private static final double GOOD_PROB_THRESHOLD = 0.5;
-    private static int SIZE_X;
-    private static int SIZE_Y;
+    private final int PIXEL_SIZE = 3;
+    private final double GOOD_PROB_THRESHOLD = 0.5;
+    private int SIZE_X;
+    private int SIZE_Y;
     private final Interpreter.Options tfliteOptions = new Interpreter.Options();
     protected volatile Interpreter interpreter;
     protected Logger log = new Logger(this.getClass());

@@ -5,6 +5,7 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -29,15 +30,21 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.onpositive.dldemos.classification.ImageClassifier;
 import com.onpositive.dldemos.data.AppDatabase;
+import com.onpositive.dldemos.data.ClassificationRVAdapter;
+import com.onpositive.dldemos.data.ClassificationResultItem;
+import com.onpositive.dldemos.data.ClassificationResultItemDao;
 import com.onpositive.dldemos.data.ContentType;
 import com.onpositive.dldemos.data.RecyclerViewAdapter;
+import com.onpositive.dldemos.data.RecyclerViewListAdapter;
 import com.onpositive.dldemos.data.ResultItem;
 import com.onpositive.dldemos.data.ResultItemDao;
 import com.onpositive.dldemos.data.TFLiteItem;
@@ -68,8 +75,6 @@ import static butterknife.OnTextChanged.Callback.AFTER_TEXT_CHANGED;
 
 public class MainActivity extends AppCompatActivity {
 
-    private static String currentPhotoPath;
-    private static String currentVideoPath;
     @BindView(R.id.tabs)
     TabLayout tabLayout;
     @BindView(R.id.container)
@@ -90,6 +95,14 @@ public class MainActivity extends AppCompatActivity {
         //TODO model properties image size(input/output)
         //TODO fragment model for image classification(find test model for this task)
         //TODO remove models tabs
+
+        //FIXME thumbnails empty at the end of list, if more than 12 result items
+        //FIXME bug on fragment resume, thumbnails are empty for result items
+        //FIXME wrong fragment type on add/delete new model
+
+        //TODO add Logger everywhere
+        //TODO add crashlytics
+        //TODO try to run segmentation model on the TF APP
         log.log("onCreate executed");
     }
 
@@ -120,10 +133,10 @@ public class MainActivity extends AppCompatActivity {
         private TFModelType tfModelType = null;
         private int size_x = 0;
         private int size_y = 0;
+        private Logger logger = new Logger(this.getClass());
 
         public TFliteAddFragment() {
         }
-        private Logger logger = new Logger(this.getClass());
 
         /**
          * Returns a new instance of this fragment for the given section
@@ -186,7 +199,7 @@ public class MainActivity extends AppCompatActivity {
                         Toast.makeText(getContext(), errMsg, Toast.LENGTH_LONG).show();
                         return;
                     }
-                    logger.log("Select tflite button pressed.");
+                    logger.log("Select interpreter button pressed.");
                     performFileSearch();
                     break;
             }
@@ -201,7 +214,7 @@ public class MainActivity extends AppCompatActivity {
                 logger.log("Selected file: " + fileName);
                 if (!fileName.endsWith(".tflite")) {
                     Toast.makeText(getContext(), R.string.tflite_add_wrong_msg, Toast.LENGTH_LONG).show();
-                    logger.log("Selected file is not tflite.");
+                    logger.log("Selected file is not interpreter.");
                     return;
                 }
                 tfldat = new TFLiteDownloaderAT(this);
@@ -237,6 +250,250 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
+    public static class ClassificationFragment extends Fragment {
+
+        public static final String ARG_SECTION_NUMBER = "section_number";
+        private static final int REQUEST_IMAGE_CAPTURE = 2;
+        private static final int PHOTO_PERMISSION_REQUEST_CODE = 3;
+        private static String currentPhotoPath;
+        private static Logger log = new Logger(ClassificationFragment.class);
+        @BindView(R.id.photoBtn)
+        public Button makePhotoBtn;
+        @BindView(R.id.classification_rv)
+        RecyclerView classificationRV;
+        RecyclerView.Adapter classifyRvAdapter;
+        List<ClassificationResultItem> classifyResultList;
+        private ClassificationAsyncTask cat;
+        private TFLiteItem tfLiteItem;
+
+        public static ClassificationFragment newInstance(TFLiteItem tfLiteItem, int sectionNumber) {
+            ClassificationFragment fragment = new ClassificationFragment();
+            fragment.tfLiteItem = tfLiteItem;
+            Bundle args = new Bundle();
+            args.putInt(ARG_SECTION_NUMBER, sectionNumber);
+            fragment.setArguments(args);
+            log.log("Created fragment on position: " + sectionNumber);
+            return fragment;
+        }
+
+        @OnClick({R.id.photoBtn})
+        public void onClick(View view) {
+            switch (view.getId()) {
+                case R.id.photoBtn:
+                    log.log("Photo button pressed");
+                    requestPermissions(new String[]{Manifest.permission.CAMERA, Manifest.permission.WRITE_EXTERNAL_STORAGE},
+                            PHOTO_PERMISSION_REQUEST_CODE);
+                    break;
+            }
+        }
+
+        @Override
+        public void onCreate(@Nullable Bundle savedInstanceState) {
+            super.onCreate(savedInstanceState);
+            setHasOptionsMenu(true);
+        }
+
+        @Override
+        public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+            inflater.inflate(R.menu.model_fragment_menu, menu);
+            super.onCreateOptionsMenu(menu, inflater);
+        }
+
+        @Override
+        public boolean onOptionsItemSelected(MenuItem item) {
+            switch (item.getItemId()) {
+                case R.id.remove_current_tab:
+                    showRemoveModelDialog();
+                    return true;
+                default:
+                    return super.onOptionsItemSelected(item);
+            }
+        }
+
+        @Override
+        public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+            View rootView = inflater.inflate(R.layout.fragment_classification, container, false);
+            ButterKnife.bind(this, rootView);
+            RecyclerView.ItemAnimator itemAnimator = new DefaultItemAnimator();
+            classificationRV.setLayoutManager(new LinearLayoutManager(this.getContext()));
+            classificationRV.setItemAnimator(itemAnimator);
+
+            try {
+                ClassificationResultItemDao resultItemDao = MLDemoApp.getInstance().getDatabase().classificationResultItemDao();
+                classifyResultList = resultItemDao.getAllByParentTF(tfLiteItem.getTfFilePath());
+                Collections.sort(classifyResultList);
+                Collections.reverse(classifyResultList);
+                classifyRvAdapter = new ClassificationRVAdapter(this.getContext(), classifyResultList);
+                classificationRV.setAdapter(classifyRvAdapter);
+            } catch (Exception e) {
+                log.error("Segmentation initialization failed:\n" + e.getMessage());
+            }
+            log.log("SegmentationFragment created");
+            return rootView;
+        }
+
+        @Override
+        public void onActivityResult(int requestCode, int resultCode, Intent data) {
+            super.onActivityResult(requestCode, resultCode, data);
+            ImageClassifier classifier = null;
+            try {
+                classifier = new ImageClassifier(this.getActivity(), tfLiteItem);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+            if (null != classifier)
+                cat = new ClassificationAsyncTask(classifier, this);
+            else
+                log.log("Classification failed. ImageClassifier object is null.");
+            if (resultCode != RESULT_OK) {
+                log.log("onActivityResult failed");
+                return;
+            }
+            switch (requestCode) {
+                case REQUEST_IMAGE_CAPTURE:
+                    log.log(" got result from camera. currentPhotoPath: " + currentPhotoPath);
+                    try {
+                        if (null != cat)
+                            cat.execute(ContentType.IMAGE);
+                        else
+                            log.log("Classification failed. ClassificationAsyncTask object is null.");
+                    } catch (Exception e) {
+                        log.log("Photo classification failed: " + e.getMessage());
+                    }
+                    break;
+            }
+        }
+
+        @Override
+        public void onRequestPermissionsResult(int requestCode,
+                                               String permissions[], int[] grantResults) {
+            switch (requestCode) {
+                case PHOTO_PERMISSION_REQUEST_CODE: {
+                    if (grantResults.length > 0
+                            && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                        log.log("Photo permission granted");
+                        dispatchTakePictureIntent();
+                    }
+                    break;
+                }
+            }
+        }
+
+        private void dispatchTakePictureIntent() {
+            File photoFile = null;
+            try {
+                photoFile = Utils.createImageFile(getActivity());
+                currentPhotoPath = photoFile.getAbsolutePath();
+            } catch (IOException ex) {
+                log.log("Image file creation failed");
+            }
+            Intent takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+            Uri photoURI = FileProvider.getUriForFile(getActivity(),
+                    "com.onpositive.dldemos.fileprovider",
+                    photoFile);
+            takePictureIntent.putExtra(MediaStore.EXTRA_OUTPUT, photoURI);
+
+            if (takePictureIntent.resolveActivity(getActivity().getPackageManager()) != null) {
+                startActivityForResult(takePictureIntent, REQUEST_IMAGE_CAPTURE);
+            }
+        }
+
+        private void showRemoveModelDialog() {
+            new AlertDialog.Builder(this.getActivity())
+                    .setTitle(getResources().getString(R.string.remove_alert_title))
+                    .setMessage(
+                            getResources().getString(R.string.remove_alert_message))
+                    .setPositiveButton(
+                            getResources().getString(R.string.yes),
+                            new DialogInterface.OnClickListener() {
+
+                                @Override
+                                public void onClick(DialogInterface dialog,
+                                                    int which) {
+                                    removeModel(tfLiteItem);
+                                }
+                            })
+                    .setNegativeButton(
+                            getResources().getString(R.string.cancel),
+                            new DialogInterface.OnClickListener() {
+
+                                @Override
+                                public void onClick(DialogInterface dialog,
+                                                    int which) {
+                                }
+                            }).show();
+        }
+
+        private void removeModel(TFLiteItem tfLiteItem) {
+            List<ResultItem> segmentItemList = MLDemoApp.getInstance().getDatabase().resultItemDao()
+                    .getAllByParentTF(tfLiteItem.getTfFilePath());
+            for (ResultItem resultItem : segmentItemList) {
+                File resultItemFile = new File(resultItem.getFilePath());
+                if (resultItemFile.exists())
+                    resultItemFile.delete();
+                MLDemoApp.getInstance().getDatabase().resultItemDao().delete(resultItem);
+            }
+
+            File modelFile = new File(tfLiteItem.getTfFilePath());
+            if (modelFile.exists())
+                modelFile.delete();
+            MLDemoApp.getInstance().getDatabase().tfLiteItemDao().delete(tfLiteItem);
+
+            ((MainActivity) getActivity()).mSectionsPagerAdapter.refreshDataSet();
+            ((MainActivity) getActivity()).mSectionsPagerAdapter.notifyDataSetChanged();
+        }
+    }
+
+    public static class ClassifyResultItemFragment extends Fragment {
+
+        private static Logger log = new Logger(ClassificationFragment.class);
+        @BindView(R.id.photo_iv)
+        ImageView photoIV;
+        @BindView(R.id.close_btn)
+        Button closeBtn;
+        @BindView(R.id.classify_results_rv)
+        RecyclerView listRV;
+        RecyclerViewListAdapter rvListAdapter;
+        private ClassificationResultItem resultItem;
+
+        public static ClassifyResultItemFragment newInstance(ClassificationResultItem item) {
+            ClassifyResultItemFragment fragment = new ClassifyResultItemFragment();
+            fragment.resultItem = item;
+            log.log("Created fragment for the file: " + item.getFilePath());
+            return fragment;
+        }
+
+        @Override
+        public void onCreate(@Nullable Bundle savedInstanceState) {
+            super.onCreate(savedInstanceState);
+        }
+
+        @Override
+        public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+            View rootView = inflater.inflate(R.layout.fragment_classifyitem, container, false);
+            ButterKnife.bind(this, rootView);
+            photoIV.setImageBitmap(BitmapFactory.decodeFile(resultItem.getFilePath()));
+            RecyclerView.ItemAnimator itemAnimator = new DefaultItemAnimator();
+            listRV.setLayoutManager(new LinearLayoutManager(this.getContext()));
+            listRV.setItemAnimator(itemAnimator);
+            try {
+                rvListAdapter = new RecyclerViewListAdapter(resultItem.getClassificationResultList());
+                listRV.setAdapter(rvListAdapter);
+            } catch (Exception e) {
+            }
+            return rootView;
+        }
+
+        @OnClick({R.id.close_btn})
+        public void onCick(View view) {
+            switch (view.getId()) {
+                case R.id.close_btn:
+                    getActivity().getSupportFragmentManager().beginTransaction().remove(this).commit();
+                    break;
+            }
+        }
+    }
+
     public static class SegmentationFragment extends Fragment {
 
         public static final String ARG_SECTION_NUMBER = "section_number";
@@ -244,6 +501,8 @@ public class MainActivity extends AppCompatActivity {
         private static final int REQUEST_IMAGE_CAPTURE = 2;
         private static final int PHOTO_PERMISSION_REQUEST_CODE = 3;
         private static final int VIDEO_PERMISSION_REQUEST_CODE = 4;
+        private static String currentPhotoPath;
+        private static String currentVideoPath;
         private static Logger log = new Logger(SegmentationFragment.class);
         @BindView(R.id.photoBtn)
         public Button makePhotoBtn;
@@ -292,6 +551,7 @@ public class MainActivity extends AppCompatActivity {
                             VIDEO_PERMISSION_REQUEST_CODE);
                     break;
                 case R.id.cancelBtn:
+                    moveRVDown(segmentationRV);
                     log.log("Cancel button pressed");
                     if (sat == null)
                         return;
@@ -487,6 +747,113 @@ public class MainActivity extends AppCompatActivity {
             ((MainActivity) getActivity()).mSectionsPagerAdapter.refreshDataSet();
             ((MainActivity) getActivity()).mSectionsPagerAdapter.notifyDataSetChanged();
         }
+
+        private void moveRVDown(RecyclerView rv) {
+            setMargins(rv, 8, 56, 8, 0);
+        }
+
+        private void moveRVUp(RecyclerView rv) {
+            setMargins(rv, 8, 8, 8, 0);
+        }
+
+        private void setMargins(View v, int l, int t, int r, int b) {
+            final float scale = this.getActivity().getBaseContext().getResources().getDisplayMetrics().density;
+            int left = (int) (l * scale + 0.5f);
+            int right = (int) (r * scale + 0.5f);
+            int top = (int) (t * scale + 0.5f);
+            int bottom = (int) (b * scale + 0.5f);
+            if (v.getLayoutParams() instanceof ViewGroup.MarginLayoutParams) {
+                ViewGroup.MarginLayoutParams p = (ViewGroup.MarginLayoutParams) v.getLayoutParams();
+                p.setMargins(left, top, right, bottom);
+                v.requestLayout();
+            }
+        }
+    }
+
+    public static class ClassificationAsyncTask extends AsyncTask<ContentType, Integer, ClassificationResultItem> {
+
+        private static Logger log = new Logger(SegmentationAsyncTask.class);
+        ClassificationResultItem classificationRI = null;
+        ContentType contentType;
+        private boolean isCanceled = false;
+        private ClassificationFragment fragment;
+        @Nullable
+        private ImageClassifier classifier;
+
+        public ClassificationAsyncTask(ImageClassifier classifier, ClassificationFragment fragment) {
+            this.classifier = classifier;
+            this.fragment = fragment;
+        }
+
+        @Override
+        protected ClassificationResultItem doInBackground(ContentType... contentTypes) {
+            switch (contentTypes[0]) {
+                case IMAGE:
+                    contentType = ContentType.IMAGE;
+                    File resultImageFile = null;
+                    try {
+                        resultImageFile = Utils.createImageFile(fragment.getActivity());
+                        FileOutputStream stream = new FileOutputStream(resultImageFile);
+                        List<ImageClassifier.Classification> classificationList = classifier.recognizeImage(BitmapFactory.decodeFile(fragment.currentPhotoPath));
+                        BitmapFactory.decodeFile(fragment.currentPhotoPath).compress(Bitmap.CompressFormat.JPEG, 100, stream);
+                        stream.flush();
+                        stream.close();
+                        String thumbnailPath = Utils.createThumbnail(fragment.getActivity(), resultImageFile.getAbsolutePath(), ContentType.IMAGE);
+                        classificationRI = new ClassificationResultItem(resultImageFile.getAbsolutePath(), ContentType.IMAGE, thumbnailPath);
+                        Collections.sort(classificationList);
+                        classificationRI.setClassificationResultList(classificationList);
+                        deleteFile(new File(fragment.currentPhotoPath));
+                        log.log("Image segmented successfully. Image file path:" + resultImageFile.getAbsolutePath());
+                    } catch (Exception e) {
+                        log.log("Failed image classification AsyncTask:\n" + e.getMessage());
+                    }
+                    break;
+            }
+            if (null != classificationRI)
+                saveClassificationResults(classificationRI);
+            return classificationRI;
+        }
+
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+            log.log("Segmentation Async Task onPreExecute");
+        }
+
+        @Override
+        protected void onPostExecute(ClassificationResultItem classificationResultItem) {
+            super.onPostExecute(classificationResultItem);
+
+            fragment.classifyResultList.add(classificationResultItem);
+            Collections.sort(fragment.classifyResultList);
+            Collections.reverse(fragment.classifyResultList);
+            fragment.classifyRvAdapter.notifyDataSetChanged();
+        }
+
+        @Override
+        protected void onProgressUpdate(Integer... values) {
+            super.onProgressUpdate(values);
+        }
+
+        @Override
+        protected void onCancelled() {
+            super.onCancelled();
+            isCanceled = isCancelled();
+            log.log("AT method 'onCancelled' executed");
+        }
+
+        private void deleteFile(File file) {
+            if (null != file && file.exists())
+                file.delete();
+            log.log("File was deleted. Is file exist: " + file.exists() +
+                    "\nDeleted file path: " + file.getAbsolutePath());
+        }
+
+        private void saveClassificationResults(ClassificationResultItem classificationResultItem) {
+            ClassificationResultItemDao resultItemDao = MLDemoApp.getInstance().getDatabase().classificationResultItemDao();
+            classificationResultItem.setTfLiteParentFile(fragment.tfLiteItem.getTfFilePath());
+            resultItemDao.insert(classificationResultItem);
+        }
     }
 
     public static class SegmentationAsyncTask extends AsyncTask<ContentType, Integer, List<ResultItem>> {
@@ -513,13 +880,13 @@ public class MainActivity extends AppCompatActivity {
                     try {
                         resultImageFile = Utils.createImageFile(fragment.getActivity());
                         FileOutputStream stream = new FileOutputStream(resultImageFile);
-                        segmentator.getSegmentedImage(currentPhotoPath)
+                        segmentator.getSegmentedImage(fragment.currentPhotoPath)
                                 .compress(Bitmap.CompressFormat.JPEG, 100, stream);
                         stream.flush();
                         stream.close();
                         String thumbnailPath = Utils.createThumbnail(fragment.getActivity(), resultImageFile.getAbsolutePath(), ContentType.IMAGE);
                         segmentationResults.add(new ResultItem(resultImageFile.getAbsolutePath(), ContentType.IMAGE, thumbnailPath));
-                        deleteFile(new File(currentPhotoPath));
+                        deleteFile(new File(fragment.currentPhotoPath));
                         log.log("Image segmented successfully. Image file path:" + resultImageFile.getAbsolutePath());
                     } catch (Exception e) {
                         log.log("Failed image segmentation AsyncTask:\n" + e.getMessage());
@@ -535,13 +902,13 @@ public class MainActivity extends AppCompatActivity {
                                 publishProgress(progressEvent.getProgressInPercent(), progressEvent.getExpectedMinutes());
                             }
                         });
-                        String segmentedVideoPath = segmentator.getSegmentedVideoPath(currentVideoPath);
+                        String segmentedVideoPath = segmentator.getSegmentedVideoPath(fragment.currentVideoPath);
                         if (isCanceled) {
                             log.log("Segmentation canceled. Segmented video was deleted. Is file exist: " + new File(segmentedVideoPath).exists());
                         } else {
                             String thumbnailPath = Utils.createThumbnail(fragment.getActivity(), segmentedVideoPath, ContentType.VIDEO);
                             segmentationResults.add(new ResultItem(segmentedVideoPath, ContentType.VIDEO, thumbnailPath));
-                            deleteFile(new File(currentVideoPath));
+                            deleteFile(new File(fragment.currentVideoPath));
                             log.log("Video segmented successfully. Video file path:" + segmentedVideoPath);
                         }
                     } catch (Exception e) {
@@ -556,6 +923,7 @@ public class MainActivity extends AppCompatActivity {
         @Override
         protected void onPreExecute() {
             super.onPreExecute();
+            fragment.moveRVDown(fragment.segmentationRV);
             fragment.progressBar.setVisibility(View.VISIBLE);
             fragment.progressStatusTV.setText(R.string.calculating);
             fragment.progressStatusTV.setVisibility(View.VISIBLE);
@@ -566,6 +934,7 @@ public class MainActivity extends AppCompatActivity {
         @Override
         protected void onPostExecute(List<ResultItem> resultItemList) {
             super.onPostExecute(resultItemList);
+            fragment.moveRVUp(fragment.segmentationRV);
             switch (contentType) {
                 case IMAGE:
                     if (resultItemList.size() > 0 && null != resultItemList.get(0).getFilePath()) {
@@ -599,6 +968,7 @@ public class MainActivity extends AppCompatActivity {
         @Override
         protected void onCancelled() {
             super.onCancelled();
+            fragment.moveRVUp(fragment.segmentationRV);
             isCanceled = isCancelled();
             fragment.progressBar.setVisibility(View.INVISIBLE);
             fragment.progressStatusTV.setVisibility(View.INVISIBLE);
@@ -670,7 +1040,11 @@ public class MainActivity extends AppCompatActivity {
                         fragment.tfModelType,
                         fragment.size_x,
                         fragment.size_y));
-                logger.log("Downloaded file path: " + outFile);
+                logger.log("Downloaded file path: " + outFile
+                        + "\n Title: " + fragment.tfliteAddTitelTV.getText().toString()
+                        + "\nModelType: " + fragment.tfModelType.toString()
+                        + "\nSize_x: " + fragment.size_x
+                        + "\nSize_y: " + fragment.size_y);
             } catch (IOException e) {
                 logger.log("File downloading failed. Error: " + e);
             }

@@ -1,7 +1,8 @@
 <resources>
-    <string name="app_name">DLDemos</string>
+    <string name="app_name">DL Model Runner</string>
     <string name="calculating">Calculating...</string>
     <string name="cancel">Cancel</string>
+    <string name="close">Close</string>
     <string name="select">Select tflite file</string>
     <string name="canceling">Canceling...</string>
     <string name="segmentation_status">Processed %1$d\%%\nExpected time: %2$d min.</string>

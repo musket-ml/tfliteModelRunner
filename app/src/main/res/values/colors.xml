@@ -4,5 +4,6 @@
     <color name="colorPrimaryDark">#303F9F</color>
     <color name="colorAccent">#FF4081</color>
     <color name="segmentationMask">#88EC407A</color>
+    <color name="fragment_background">#B3696969</color>
     <color name="cardview_select_background">#81D4FA</color>
 </resources>

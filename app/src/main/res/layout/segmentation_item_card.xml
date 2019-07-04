@@ -33,6 +33,18 @@
             card_view:layout_constraintStart_toEndOf="@+id/segmentation_previewIV"
             card_view:layout_constraintTop_toTopOf="parent" />
 
+        <TextView
+            android:id="@+id/info_tv"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="8dp"
+            android:layout_marginTop="8dp"
+            android:layout_marginEnd="8dp"
+            android:visibility="invisible"
+            card_view:layout_constraintEnd_toEndOf="parent"
+            card_view:layout_constraintStart_toEndOf="@+id/segmentation_previewIV"
+            card_view:layout_constraintTop_toBottomOf="@+id/file_nameTV" />
+
 
     </android.support.constraint.ConstraintLayout>
 
