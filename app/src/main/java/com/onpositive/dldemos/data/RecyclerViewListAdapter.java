@@ -8,6 +8,7 @@ import android.widget.TextView;
 
 import com.onpositive.dldemos.R;
 import com.onpositive.dldemos.classification.ImageClassifier;
+import com.onpositive.dldemos.tools.Logger;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -19,6 +20,7 @@ import butterknife.ButterKnife;
 public class RecyclerViewListAdapter extends RecyclerView.Adapter<RecyclerViewListAdapter.ListItemHolder> {
 
     private static final float FILTER_VALUE = 0.5f;
+    private static Logger log = new Logger(RecyclerViewListAdapter.class);
     private List<ImageClassifier.Classification> classificationRIFilteredList;
 
     public RecyclerViewListAdapter(List<ImageClassifier.Classification> classificationResultItemList) {
@@ -31,6 +33,7 @@ public class RecyclerViewListAdapter extends RecyclerView.Adapter<RecyclerViewLi
         }
         Collections.reverse(classificationFilteredList);
         this.classificationRIFilteredList = classificationFilteredList;
+        log.log("RecyclerViewListAdapter created");
     }
 
     @Override

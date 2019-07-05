@@ -72,6 +72,7 @@ public class ImageClassifier {
             labels.add(line);
         }
         reader.close();
+        log.log("Labels load completed");
         return labels;
     }
 
@@ -149,6 +150,7 @@ public class ImageClassifier {
             recognitions.add(pq.poll());
         }
         Trace.endSection();
+        log.log("Classification successful. Results count: " + recognitions.size());
         return recognitions;
     }
 
@@ -162,6 +164,7 @@ public class ImageClassifier {
             gpuDelegate = null;
         }
         tfliteModel = null;
+        log.log("Closed. Interpreter and model is null");
     }
 
     private void recreateInterpreter() {
@@ -245,6 +248,7 @@ public class ImageClassifier {
         public Classification(final String title, final Float confidence) {
             this.title = title;
             this.confidence = confidence;
+            log.log("Classification created: " + this.toString());
         }
 
         public String getTitle() {

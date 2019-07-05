@@ -103,18 +103,20 @@ public class MainActivity extends AppCompatActivity {
         //TODO add Logger everywhere
         //TODO add crashlytics
         //TODO try to run segmentation model on the TF APP
-        log.log("onCreate executed");
+        log.log("onCreate executed. Tabs load complete.");
     }
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
+        log.log("onActivityResult");
     }
 
     public static class TFliteAddFragment extends Fragment {
 
         public static final String ARG_SECTION_NUMBER = "section_number";
         private static final int READ_REQUEST_CODE = 5;
+        private static Logger logger = new Logger(TFliteAddFragment.class);
         @BindView(R.id.tflite_add_title)
         TextView tfliteAddTitelTV;
         @BindView(R.id.model_type_rg)
@@ -133,7 +135,6 @@ public class MainActivity extends AppCompatActivity {
         private TFModelType tfModelType = null;
         private int size_x = 0;
         private int size_y = 0;
-        private Logger logger = new Logger(this.getClass());
 
         public TFliteAddFragment() {
         }
@@ -147,7 +148,7 @@ public class MainActivity extends AppCompatActivity {
             Bundle args = new Bundle();
             args.putInt(ARG_SECTION_NUMBER, sectionNumber);
             fragment.setArguments(args);
-//            log.log("Created fragment on position: " + sectionNumber);
+            logger.log("Created fragment on position: " + sectionNumber);
             return fragment;
         }
 
@@ -157,9 +158,11 @@ public class MainActivity extends AppCompatActivity {
                 switch (radioButton.getId()) {
                     case R.id.segmentation_rb:
                         tfModelType = TFModelType.SEGMENTATION;
+                        logger.log("Selected TFModelType is: " + TFModelType.SEGMENTATION.toString());
                         break;
                     case R.id.classification_rb:
                         tfModelType = TFModelType.CLASSIFICATION;
+                        logger.log("Selected TFModelType is: " + TFModelType.CLASSIFICATION.toString());
                         break;
                 }
             }
@@ -167,14 +170,18 @@ public class MainActivity extends AppCompatActivity {
 
         @OnTextChanged(value = R.id.size_x, callback = AFTER_TEXT_CHANGED)
         public void widthTextChanged(Editable s) {
-            if (!s.toString().isEmpty())
+            if (!s.toString().isEmpty()) {
                 size_x = Integer.valueOf(s.toString());
+                logger.log("User input size_x: " + size_x);
+            }
         }
 
         @OnTextChanged(value = R.id.size_y, callback = AFTER_TEXT_CHANGED)
         public void heightTextChanged(Editable s) {
-            if (!s.toString().isEmpty())
+            if (!s.toString().isEmpty()) {
                 size_y = Integer.valueOf(s.toString());
+                logger.log("User input size_y: " + size_y);
+            }
         }
 
         @OnClick(R.id.btn_tf_select)
@@ -196,6 +203,7 @@ public class MainActivity extends AppCompatActivity {
                         hasErr = true;
                     }
                     if (hasErr) {
+                        logger.log("Wrong settings for tflite file: " + errMsg);
                         Toast.makeText(getContext(), errMsg, Toast.LENGTH_LONG).show();
                         return;
                     }
@@ -226,6 +234,7 @@ public class MainActivity extends AppCompatActivity {
         public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
             View rootView = inflater.inflate(R.layout.fragment_tflite_add, container, false);
             ButterKnife.bind(this, rootView);
+            logger.log("onCreateView executed");
             return rootView;
         }
 
@@ -233,8 +242,8 @@ public class MainActivity extends AppCompatActivity {
             Intent intent = new Intent(Intent.ACTION_OPEN_DOCUMENT);
             intent.addCategory(Intent.CATEGORY_OPENABLE);
             intent.setType("*/*");
-
             startActivityForResult(intent, READ_REQUEST_CODE);
+            logger.log("Started ACTION_OPEN_DOCUMENT with READ_REQUEST_CODE");
         }
 
         public void showDownloading(boolean isDownloading) {
@@ -242,10 +251,12 @@ public class MainActivity extends AppCompatActivity {
                 tfliteAddProgress.setVisibility(View.VISIBLE);
                 tfliteAddStatus.setVisibility(View.VISIBLE);
                 tfliteAddStatus.setText(R.string.tflite_add_downloading);
+                logger.log("Download status views are visible");
             } else {
                 tfliteAddProgress.setVisibility(View.INVISIBLE);
                 tfliteAddStatus.setVisibility(View.INVISIBLE);
                 tfliteAddStatus.setText("");
+                logger.log("Download status views are invisible");
             }
         }
     }
@@ -291,21 +302,25 @@ public class MainActivity extends AppCompatActivity {
         public void onCreate(@Nullable Bundle savedInstanceState) {
             super.onCreate(savedInstanceState);
             setHasOptionsMenu(true);
+            log.log("onCreate executed");
         }
 
         @Override
         public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
             inflater.inflate(R.menu.model_fragment_menu, menu);
             super.onCreateOptionsMenu(menu, inflater);
+            log.log("onCreateOptionsMenu executed");
         }
 
         @Override
         public boolean onOptionsItemSelected(MenuItem item) {
             switch (item.getItemId()) {
                 case R.id.remove_current_tab:
+                    log.log("onOptionsItemSelected. showRemoveModelDialog");
                     showRemoveModelDialog();
                     return true;
                 default:
+                    log.log("onOptionsItemSelected super.onOptionsItemSelected");
                     return super.onOptionsItemSelected(item);
             }
         }
@@ -317,7 +332,7 @@ public class MainActivity extends AppCompatActivity {
             RecyclerView.ItemAnimator itemAnimator = new DefaultItemAnimator();
             classificationRV.setLayoutManager(new LinearLayoutManager(this.getContext()));
             classificationRV.setItemAnimator(itemAnimator);
-
+            log.log("onCreateView");
             try {
                 ClassificationResultItemDao resultItemDao = MLDemoApp.getInstance().getDatabase().classificationResultItemDao();
                 classifyResultList = resultItemDao.getAllByParentTF(tfLiteItem.getTfFilePath());
@@ -325,6 +340,7 @@ public class MainActivity extends AppCompatActivity {
                 Collections.reverse(classifyResultList);
                 classifyRvAdapter = new ClassificationRVAdapter(this.getContext(), classifyResultList);
                 classificationRV.setAdapter(classifyRvAdapter);
+                log.log("Classification Recycler View content uploaded");
             } catch (Exception e) {
                 log.error("Segmentation initialization failed:\n" + e.getMessage());
             }
@@ -335,15 +351,17 @@ public class MainActivity extends AppCompatActivity {
         @Override
         public void onActivityResult(int requestCode, int resultCode, Intent data) {
             super.onActivityResult(requestCode, resultCode, data);
+            log.log("onActivityResult. Request code: " + requestCode + ", resultCode: " + resultCode);
             ImageClassifier classifier = null;
             try {
                 classifier = new ImageClassifier(this.getActivity(), tfLiteItem);
             } catch (IOException e) {
-                e.printStackTrace();
+                log.log("ImageClassifier creation failed: " + e.getMessage());
             }
-            if (null != classifier)
+            if (null != classifier) {
+                log.log("ImageClassifier created. ");
                 cat = new ClassificationAsyncTask(classifier, this);
-            else
+            } else
                 log.log("Classification failed. ImageClassifier object is null.");
             if (resultCode != RESULT_OK) {
                 log.log("onActivityResult failed");
@@ -353,9 +371,10 @@ public class MainActivity extends AppCompatActivity {
                 case REQUEST_IMAGE_CAPTURE:
                     log.log(" got result from camera. currentPhotoPath: " + currentPhotoPath);
                     try {
-                        if (null != cat)
+                        if (null != cat) {
                             cat.execute(ContentType.IMAGE);
-                        else
+                            log.log("Classification Async Task execution started");
+                        } else
                             log.log("Classification failed. ClassificationAsyncTask object is null.");
                     } catch (Exception e) {
                         log.log("Photo classification failed: " + e.getMessage());
@@ -387,6 +406,7 @@ public class MainActivity extends AppCompatActivity {
             } catch (IOException ex) {
                 log.log("Image file creation failed");
             }
+            log.log("Image file created");
             Intent takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
             Uri photoURI = FileProvider.getUriForFile(getActivity(),
                     "com.onpositive.dldemos.fileprovider",
@@ -394,6 +414,7 @@ public class MainActivity extends AppCompatActivity {
             takePictureIntent.putExtra(MediaStore.EXTRA_OUTPUT, photoURI);
 
             if (takePictureIntent.resolveActivity(getActivity().getPackageManager()) != null) {
+                log.log("Starting takePictureIntent");
                 startActivityForResult(takePictureIntent, REQUEST_IMAGE_CAPTURE);
             }
         }
@@ -422,6 +443,7 @@ public class MainActivity extends AppCompatActivity {
                                                     int which) {
                                 }
                             }).show();
+            log.log("RemoveModelDialog is active");
         }
 
         private void removeModel(TFLiteItem tfLiteItem) {
@@ -441,6 +463,7 @@ public class MainActivity extends AppCompatActivity {
 
             ((MainActivity) getActivity()).mSectionsPagerAdapter.refreshDataSet();
             ((MainActivity) getActivity()).mSectionsPagerAdapter.notifyDataSetChanged();
+            log.log("TFLite Model deleted with its files");
         }
     }
 
@@ -466,6 +489,7 @@ public class MainActivity extends AppCompatActivity {
         @Override
         public void onCreate(@Nullable Bundle savedInstanceState) {
             super.onCreate(savedInstanceState);
+            log.log("onCreate executed");
         }
 
         @Override
@@ -479,7 +503,9 @@ public class MainActivity extends AppCompatActivity {
             try {
                 rvListAdapter = new RecyclerViewListAdapter(resultItem.getClassificationResultList());
                 listRV.setAdapter(rvListAdapter);
+                log.log("Classification results were uploaded");
             } catch (Exception e) {
+                log.log("Classification results upload failed: " + e.getMessage());
             }
             return rootView;
         }
@@ -488,6 +514,7 @@ public class MainActivity extends AppCompatActivity {
         public void onCick(View view) {
             switch (view.getId()) {
                 case R.id.close_btn:
+                    log.log("Close button clicked");
                     getActivity().getSupportFragmentManager().beginTransaction().remove(this).commit();
                     break;
             }
@@ -565,21 +592,25 @@ public class MainActivity extends AppCompatActivity {
         public void onCreate(@Nullable Bundle savedInstanceState) {
             super.onCreate(savedInstanceState);
             setHasOptionsMenu(true);
+            log.log("onCreate executed");
         }
 
         @Override
         public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
             inflater.inflate(R.menu.model_fragment_menu, menu);
             super.onCreateOptionsMenu(menu, inflater);
+            log.log("onCreateOptionsMenu executed");
         }
 
         @Override
         public boolean onOptionsItemSelected(MenuItem item) {
             switch (item.getItemId()) {
                 case R.id.remove_current_tab:
+                    log.log("onOptionsItemSelected. showRemoveModelDialog");
                     showRemoveModelDialog();
                     return true;
                 default:
+                    log.log("super.onOptionsItemSelected");
                     return super.onOptionsItemSelected(item);
             }
         }
@@ -591,7 +622,7 @@ public class MainActivity extends AppCompatActivity {
             RecyclerView.ItemAnimator itemAnimator = new DefaultItemAnimator();
             segmentationRV.setLayoutManager(new LinearLayoutManager(this.getContext()));
             segmentationRV.setItemAnimator(itemAnimator);
-
+            log.log("onCreateView");
             try {
                 ResultItemDao resultItemDao = MLDemoApp.getInstance().getDatabase().resultItemDao();
                 segResultList = resultItemDao.getAllByParentTF(tfLiteItem.getTfFilePath());
@@ -599,6 +630,7 @@ public class MainActivity extends AppCompatActivity {
                 Collections.reverse(segResultList);
                 segRvAdapter = new RecyclerViewAdapter(this.getContext(), segResultList);
                 segmentationRV.setAdapter(segRvAdapter);
+                log.log("Segmentation Recycler View content upload successful");
             } catch (Exception e) {
                 log.error("Segmentation initialization failed:\n" + e.getMessage());
             }
@@ -612,8 +644,9 @@ public class MainActivity extends AppCompatActivity {
             Segmentator segmentator = null;
             try {
                 segmentator = new VideoSegmentator(this.getActivity(), tfLiteItem);
+                log.log("VideoSegmentator initialization successful");
             } catch (IOException e) {
-                e.printStackTrace();
+                log.log("VideoSegmentator initialization failed " + e.getMessage());
             }
             sat = new SegmentationAsyncTask(segmentator, this);
             if (resultCode != RESULT_OK) {
@@ -625,6 +658,7 @@ public class MainActivity extends AppCompatActivity {
                     log.log(" got result from camera. currentPhotoPath: " + currentPhotoPath);
                     try {
                         sat.execute(ContentType.IMAGE);
+                        log.log("SegmentationAsyncTask started");
                     } catch (Exception e) {
                         log.log("Photo segmentation failed: " + e.getMessage());
                         progressBar.setVisibility(ProgressBar.INVISIBLE);
@@ -680,6 +714,7 @@ public class MainActivity extends AppCompatActivity {
             takeVideoIntent.putExtra(MediaStore.EXTRA_OUTPUT, videoURI);
 
             if (takeVideoIntent.resolveActivity(getActivity().getPackageManager()) != null) {
+                log.log("Started intent: takeVideoIntent");
                 startActivityForResult(takeVideoIntent, REQUEST_VIDEO_CAPTURE);
             }
         }
@@ -699,6 +734,7 @@ public class MainActivity extends AppCompatActivity {
             takePictureIntent.putExtra(MediaStore.EXTRA_OUTPUT, photoURI);
 
             if (takePictureIntent.resolveActivity(getActivity().getPackageManager()) != null) {
+                log.log("Started intent: takeVideoIntent");
                 startActivityForResult(takePictureIntent, REQUEST_IMAGE_CAPTURE);
             }
         }
@@ -727,6 +763,7 @@ public class MainActivity extends AppCompatActivity {
                                                     int which) {
                                 }
                             }).show();
+            log.log("RemoveModelDialog is active");
         }
 
         private void removeModel(TFLiteItem tfLiteItem) {
@@ -746,14 +783,17 @@ public class MainActivity extends AppCompatActivity {
 
             ((MainActivity) getActivity()).mSectionsPagerAdapter.refreshDataSet();
             ((MainActivity) getActivity()).mSectionsPagerAdapter.notifyDataSetChanged();
+            log.log("TFLite Model deleted with its files");
         }
 
         private void moveRVDown(RecyclerView rv) {
             setMargins(rv, 8, 56, 8, 0);
+            log.log("Recycler View moved down");
         }
 
         private void moveRVUp(RecyclerView rv) {
             setMargins(rv, 8, 8, 8, 0);
+            log.log("Recycler View moved up");
         }
 
         private void setMargins(View v, int l, int t, int r, int b) {
@@ -767,6 +807,7 @@ public class MainActivity extends AppCompatActivity {
                 p.setMargins(left, top, right, bottom);
                 v.requestLayout();
             }
+            log.log("Recycler View top marging changed to: " + top + "dp");
         }
     }
 
@@ -803,7 +844,7 @@ public class MainActivity extends AppCompatActivity {
                         Collections.sort(classificationList);
                         classificationRI.setClassificationResultList(classificationList);
                         deleteFile(new File(fragment.currentPhotoPath));
-                        log.log("Image segmented successfully. Image file path:" + resultImageFile.getAbsolutePath());
+                        log.log("Image classified successfully. Image file path:" + resultImageFile.getAbsolutePath());
                     } catch (Exception e) {
                         log.log("Failed image classification AsyncTask:\n" + e.getMessage());
                     }
@@ -828,10 +869,12 @@ public class MainActivity extends AppCompatActivity {
             Collections.sort(fragment.classifyResultList);
             Collections.reverse(fragment.classifyResultList);
             fragment.classifyRvAdapter.notifyDataSetChanged();
+            log.log("'onPostExecute' executed");
         }
 
         @Override
         protected void onProgressUpdate(Integer... values) {
+            log.log("onProgressUpdate called");
             super.onProgressUpdate(values);
         }
 
@@ -853,6 +896,7 @@ public class MainActivity extends AppCompatActivity {
             ClassificationResultItemDao resultItemDao = MLDemoApp.getInstance().getDatabase().classificationResultItemDao();
             classificationResultItem.setTfLiteParentFile(fragment.tfLiteItem.getTfFilePath());
             resultItemDao.insert(classificationResultItem);
+            log.log("ClassificationResults are saved");
         }
     }
 
@@ -869,6 +913,7 @@ public class MainActivity extends AppCompatActivity {
         public SegmentationAsyncTask(Segmentator segmentator, SegmentationFragment fragment) {
             this.segmentator = segmentator;
             this.fragment = fragment;
+            log.log("SegmentationAsyncTask object created");
         }
 
         @Override
@@ -917,6 +962,7 @@ public class MainActivity extends AppCompatActivity {
                     break;
             }
             saveSegmentationResults(segmentationResults);
+            log.log("Segmentation successful. Result saved");
             return segmentationResults;
         }
 
@@ -955,6 +1001,7 @@ public class MainActivity extends AppCompatActivity {
             Collections.sort(fragment.segResultList);
             Collections.reverse(fragment.segResultList);
             fragment.segRvAdapter.notifyDataSetChanged();
+            log.log("'onPostExecute' executed");
         }
 
         @Override
@@ -989,6 +1036,7 @@ public class MainActivity extends AppCompatActivity {
                 resultItem.setTfLiteParentFile(fragment.tfLiteItem.getTfFilePath());
                 resultItemDao.insert(resultItem);
             }
+            log.log("Segmentation results are saved");
         }
     }
 
@@ -999,6 +1047,7 @@ public class MainActivity extends AppCompatActivity {
 
         public TFLiteDownloaderAT(TFliteAddFragment fragment) {
             this.fragment = fragment;
+            logger.log("TFLiteDownloaderAT object created");
         }
 
         @Override
@@ -1011,6 +1060,7 @@ public class MainActivity extends AppCompatActivity {
         protected void onPreExecute() {
             super.onPreExecute();
             fragment.showDownloading(true);
+            logger.log("onPreExecute called");
         }
 
         @Override
@@ -1018,6 +1068,7 @@ public class MainActivity extends AppCompatActivity {
             fragment.showDownloading(false);
             ((MainActivity) fragment.getActivity()).mSectionsPagerAdapter.refreshDataSet();
             ((MainActivity) fragment.getActivity()).mSectionsPagerAdapter.notifyDataSetChanged();
+            logger.log("onPostExecute called");
         }
 
         private void downloadFile(Uri uri) {
@@ -1067,31 +1118,30 @@ public class MainActivity extends AppCompatActivity {
             db = MLDemoApp.getInstance().getDatabase();
             tfLiteItemDao = db.tfLiteItemDao();
             tfLiteItems = tfLiteItemDao.getAll();
+            log.log("SectionsPagerAdapter created");
         }
 
         @Override
         public Fragment getItem(int position) {
-            if (position + 1 == getCount() && !hasTFLadd) {
+            if (position == getCount() - 1 && !hasTFLadd) {
                 hasTFLadd = true;
-                log.log("Loaded fragment for adding a tflite file");
                 return TFliteAddFragment.newInstance(position);
-            } else if (position + 1 == getCount() && hasTFLadd) {
-                return SegmentationFragment.newInstance(tfLiteItems.get(position - 1), position);
-            } else {
-                return SegmentationFragment.newInstance(tfLiteItems.get(position), position);
             }
         }
 
         @Override
         public int getCount() {
+            log.log("Tabs count: " + tfLiteItems.size() + 1);
             return tfLiteItems.size() + 1;
         }
 
         @Override
         public CharSequence getPageTitle(int position) {
             if (position < getCount() - 1) {
+                log.log("Tab title: " + tfLiteItems.get(position).getTitle() + "\n Tab position: " + position);
                 return tfLiteItems.get(position).getTitle();
             } else if (position == getCount() - 1) {
+                log.log("Tab title: " + getResources().getString(R.string.add_new) + "\n Tab position: " + position);
                 return getResources().getString(R.string.add_new);
             } else
                 return null;
@@ -1099,6 +1149,7 @@ public class MainActivity extends AppCompatActivity {
 
         public void refreshDataSet() {
             tfLiteItems = tfLiteItemDao.getAll();
+            log.log("tfLite model items list reloaded");
         }
     }
 }
