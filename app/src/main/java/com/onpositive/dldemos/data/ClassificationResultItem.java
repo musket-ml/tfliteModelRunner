@@ -8,6 +8,7 @@ import com.onpositive.dldemos.data.TypeConverters.ClassificationResultItemConver
 import com.onpositive.dldemos.data.TypeConverters.ResultItemConverter;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 @Entity
@@ -24,6 +25,8 @@ public class ClassificationResultItem extends ResultItem {
     }
 
     public List<ImageClassifier.Classification> getClassificationResultList() {
+        Collections.sort(classificationResultList);
+        Collections.reverse(classificationResultList);
         return classificationResultList;
     }
 
