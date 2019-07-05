@@ -62,7 +62,7 @@ public class Utils {
 
             File thumbnailFile = createImageFile(activity);
             OutputStream out = new FileOutputStream(thumbnailFile);
-            preview.compress(Bitmap.CompressFormat.JPEG, 100, out);
+            preview.compress(Bitmap.CompressFormat.JPEG, 50, out);
             out.flush();
             out.close();
             thumbnailPath = thumbnailFile.getAbsolutePath();
