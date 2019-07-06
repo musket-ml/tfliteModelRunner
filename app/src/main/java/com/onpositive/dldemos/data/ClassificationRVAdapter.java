@@ -14,8 +14,8 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.onpositive.dldemos.ClassifyResultItemFragment;
 import com.onpositive.dldemos.MLDemoApp;
-import com.onpositive.dldemos.MainActivity;
 import com.onpositive.dldemos.R;
 import com.onpositive.dldemos.classification.ImageClassifier;
 import com.onpositive.dldemos.tools.Logger;
@@ -143,7 +143,7 @@ public class ClassificationRVAdapter extends RecyclerView.Adapter<Classification
             log.log("onClick() click mode");
 
             ClassificationResultItem item = (ClassificationResultItem) itemList.get(getAdapterPosition());
-            MainActivity.ClassifyResultItemFragment itemResultFragment = MainActivity.ClassifyResultItemFragment.newInstance(item);
+            ClassifyResultItemFragment itemResultFragment = ClassifyResultItemFragment.newInstance(item);
             FragmentManager fragmentManager = ((AppCompatActivity) context).getSupportFragmentManager();
             fragmentManager.beginTransaction().replace(R.id.fragment_classification, itemResultFragment).commit();
             log.log("onClick RV item. STarted fragment for the file path: " + item.getFilePath() + "\ngetAdapterPosition: " + getAdapterPosition());
