@@ -18,7 +18,7 @@ public class MainActivity extends AppCompatActivity {
     TabLayout tabLayout;
     @BindView(R.id.container)
     ViewPager mViewPager;
-    private SectionsPagerAdapter mSectionsPagerAdapter;
+    private static SectionsPagerAdapter mSectionsPagerAdapter;
     private Logger log = new Logger(this.getClass());
 
     @Override
@@ -57,5 +57,10 @@ public class MainActivity extends AppCompatActivity {
 
     public void setSectionsPagerAdapter(SectionsPagerAdapter mSectionsPagerAdapter) {
         this.mSectionsPagerAdapter = mSectionsPagerAdapter;
+    }
+
+    public static void refreshTabs() {
+        mSectionsPagerAdapter.refreshDataSet();
+        mSectionsPagerAdapter.notifyDataSetChanged();
     }
 }
