@@ -19,7 +19,7 @@ import java.util.List;
 
 public class ClassificationAsyncTask extends AsyncTask<ContentType, Integer, ClassificationResultItem> {
 
-    private static Logger log = new Logger(MainActivity.SegmentationAsyncTask.class);
+    private static Logger log = new Logger(SegmentationAsyncTask.class);
     ClassificationResultItem classificationRI = null;
     ContentType contentType;
     private boolean isCanceled = false;
