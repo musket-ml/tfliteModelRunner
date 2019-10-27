@@ -1,5 +1,6 @@
 package com.onpositive.dldemos;
 
+import android.content.Intent;
 import android.net.Uri;
 import android.os.AsyncTask;
 
@@ -43,6 +44,10 @@ public class TFLiteDownloaderAT extends AsyncTask<Uri, Integer, Void> {
         ((MainActivity) fragment.getActivity()).getSectionsPagerAdapter().refreshDataSet();
         ((MainActivity) fragment.getActivity()).getSectionsPagerAdapter().notifyDataSetChanged();
         logger.log("onPostExecute called");
+
+        Intent intent = fragment.getActivity().getIntent(); //FIXME activity should not reload after fragment creation. New tab with a model fragment should be inserted without activity reload.
+        fragment.getActivity().finish();
+        fragment.getActivity().startActivity(intent);
     }
 
     private void downloadFile(Uri uri) {
