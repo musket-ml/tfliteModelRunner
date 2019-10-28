@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">DL Model Runner</string>
+    <string name="app_name">TF Model Runner</string>
     <string name="calculating">Calculating...</string>
     <string name="cancel">Cancel</string>
     <string name="close">Close</string>
