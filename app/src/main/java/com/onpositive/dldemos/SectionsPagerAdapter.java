@@ -19,7 +19,6 @@ public class SectionsPagerAdapter extends FragmentPagerAdapter {
     private AppDatabase db;
     private TFLiteItemDao tfLiteItemDao;
     private List<TFLiteItem> tfLiteItems;
-    private boolean hasTFLadd = false;
     private Context context;
 
     public SectionsPagerAdapter(FragmentManager fm, Context context) {
@@ -33,29 +32,15 @@ public class SectionsPagerAdapter extends FragmentPagerAdapter {
 
     @Override
     public Fragment getItem(int position) {
-        if (position == getCount() - 1 && !hasTFLadd) {
-            hasTFLadd = true;
+        if (position == tfLiteItems.size()) {
             return TFliteAddFragment.newInstance(position);
         }
-        if (position == getCount() - 1 && hasTFLadd) {
-            position -= 1;
-        }
-        //TODO check that model match fragment position
         TFLiteItem tfLiteItem = tfLiteItems.get(position);
-        if (tfLiteItem.getModelType() == TFModelType.SEGMENTATION)
-            return SegmentationFragment.newInstance(tfLiteItem, position);
-        else if (tfLiteItem.getModelType() == TFModelType.CLASSIFICATION)
+        if (tfLiteItem.getModelType() == TFModelType.CLASSIFICATION) {
             return ClassificationFragment.newInstance(tfLiteItem, position);
-//            if (position < getCount() - 1) {
-//                TFLiteItem tfLiteItem = tfLiteItems.get(position);
-//                if (tfLiteItem.getModelType() == TFModelType.SEGMENTATION)
-//                    return SegmentationFragment.newInstance(tfLiteItem, position);
-//                else if (tfLiteItem.getModelType() == TFModelType.CLASSIFICATION)
-//                    return ClassificationFragment.newInstance(tfLiteItem, position);
-//            } else if (position == getCount() - 1) {
-//                log.log("Loaded fragment for adding a interpreter file");
-//                return TFliteAddFragment.newInstance(position);
-//            }
+        } else if (tfLiteItem.getModelType() == TFModelType.SEGMENTATION) {
+            return SegmentationFragment.newInstance(tfLiteItem, position);
+        }
         return null;
     }
 
