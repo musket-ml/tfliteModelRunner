@@ -307,6 +307,9 @@ public class SegmentationFragment extends Fragment {
 
         ((MainActivity) getActivity()).getSectionsPagerAdapter().refreshDataSet();
         ((MainActivity) getActivity()).getSectionsPagerAdapter().notifyDataSetChanged();
+        Intent intent = this.getActivity().getIntent();
+        this.getActivity().finish();
+        this.getActivity().startActivity(intent);
         log.log("TFLite Model deleted with its files");
     }
 
