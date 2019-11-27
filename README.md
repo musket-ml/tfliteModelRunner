@@ -33,3 +33,7 @@ After file loading, a new tab with the specified name will be created.
 1) Click on the desired tab.
 2) Click on the camera button.
 3) Take a photo or video. Wait for the end of processing. 
+
+### View results
+
+Click on the result item.
