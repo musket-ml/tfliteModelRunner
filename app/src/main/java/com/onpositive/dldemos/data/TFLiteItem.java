@@ -21,12 +21,18 @@ public class TFLiteItem {
     private TFModelType modelType;
     private int size_x;
     private int size_y;
+    private String labelsPath = null;
 
     public TFLiteItem() {
     }
 
     public TFLiteItem(String tfFilePath, String title, TFModelType tfModelType, int width, int height) {
         this(tfFilePath, title, false, tfModelType, width, height);
+    }
+
+    public TFLiteItem(String tfFilePath, String title, TFModelType tfModelType, int width, int height, String labelsPath) {
+        this(tfFilePath, title, false, tfModelType, width, height);
+        this.labelsPath = labelsPath;
     }
 
     @Ignore
@@ -85,5 +91,13 @@ public class TFLiteItem {
 
     public void setSize_y(int size_y) {
         this.size_y = size_y;
+    }
+
+    public String getLabelsPath() {
+        return labelsPath;
+    }
+
+    public void setLabelsPath(String labelsPath) {
+        this.labelsPath = labelsPath;
     }
 }
