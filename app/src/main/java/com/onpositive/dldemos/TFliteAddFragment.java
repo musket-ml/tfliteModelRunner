@@ -19,6 +19,8 @@ import com.onpositive.dldemos.data.TFModelType;
 import com.onpositive.dldemos.tools.Logger;
 import com.onpositive.dldemos.tools.Utils;
 
+import java.io.File;
+
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnCheckedChanged;
@@ -32,6 +34,7 @@ public class TFliteAddFragment extends Fragment {
 
     public static final String ARG_SECTION_NUMBER = "section_number";
     private static final int READ_REQUEST_CODE = 5;
+    private static final int READ_LABELS_REQUEST_CODE = 6;
     private static Logger logger = new Logger(TFliteAddFragment.class);
     @BindView(R.id.tflite_add_title)
     TextView tfliteAddTitelTV;
@@ -41,6 +44,10 @@ public class TFliteAddFragment extends Fragment {
     TextView modelInputWidth;
     @BindView(R.id.size_y)
     TextView modelInputHeight;
+    @BindView(R.id.labels_add_two_info)
+    TextView labelsInfo;
+    @BindView(R.id.btn_labels_select)
+    Button btnLabelsSelect;
     @BindView(R.id.btn_tf_select)
     Button btnTFSelect;
     @BindView(R.id.tflite_progress_bar)
@@ -51,6 +58,7 @@ public class TFliteAddFragment extends Fragment {
     private TFModelType tfModelType = null;
     private int size_x = 0;
     private int size_y = 0;
+    private String labelsPath = null;
 
     public TFliteAddFragment() {
     }
@@ -73,12 +81,10 @@ public class TFliteAddFragment extends Fragment {
         if (checked) {
             switch (radioButton.getId()) {
                 case R.id.segmentation_rb:
-                    tfModelType = TFModelType.SEGMENTATION;
-                    logger.log("Selected TFModelType is: " + TFModelType.SEGMENTATION.toString());
+                    setSegmentationMode();
                     break;
                 case R.id.classification_rb:
-                    tfModelType = TFModelType.CLASSIFICATION;
-                    logger.log("Selected TFModelType is: " + TFModelType.CLASSIFICATION.toString());
+                    setClassificationMode();
                     break;
             }
         }
@@ -100,7 +106,7 @@ public class TFliteAddFragment extends Fragment {
         }
     }
 
-    @OnClick(R.id.btn_tf_select)
+    @OnClick({R.id.btn_tf_select, R.id.btn_labels_select})
     public void onClick(View view) {
         switch (view.getId()) {
             case R.id.btn_tf_select:
@@ -118,13 +124,20 @@ public class TFliteAddFragment extends Fragment {
                     errMsg += getContext().getString(R.string.tflite_add_empty_size_msg) + "\n";
                     hasErr = true;
                 }
+                if (tfModelType == TFModelType.CLASSIFICATION && labelsPath == null) {
+                    errMsg += getContext().getString(R.string.tflite_add_labels_file_msg) + "\n";
+                    hasErr = true;
+                }
                 if (hasErr) {
                     logger.log("Wrong settings for tflite file: " + errMsg);
                     Toast.makeText(getContext(), errMsg, Toast.LENGTH_LONG).show();
                     return;
                 }
                 logger.log("Select interpreter button pressed.");
-                performFileSearch();
+                performFileSearch(READ_REQUEST_CODE);
+                break;
+            case R.id.btn_labels_select:
+                performFileSearch(READ_LABELS_REQUEST_CODE);
                 break;
         }
     }
@@ -132,7 +145,12 @@ public class TFliteAddFragment extends Fragment {
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        if (requestCode == READ_REQUEST_CODE && resultCode == RESULT_OK && data != null) {
+        logger.log("onActivityResult");
+        if (resultCode != RESULT_OK || data == null) {
+            logger.log("Operation canceled or failed. Result code: " + resultCode);
+            return;
+        }
+        if (requestCode == READ_REQUEST_CODE) {
             Uri uri = data.getData();
             String fileName = Utils.getFileName(getActivity(), uri);
             logger.log("Selected file: " + fileName);
@@ -143,6 +161,17 @@ public class TFliteAddFragment extends Fragment {
             }
             tfldat = new TFLiteDownloaderAT(this);
             tfldat.execute(uri);
+        } else if (requestCode == READ_LABELS_REQUEST_CODE) {
+            Uri uri = data.getData();
+            String fileName = Utils.getFileName(getActivity(), uri);
+            logger.log("Selected labels file: " + fileName);
+            if (!fileName.endsWith(".txt")) {
+                Toast.makeText(getContext(), R.string.tflite_add_wrong_msg, Toast.LENGTH_LONG).show();
+                logger.log("Selected file is not TXT.");
+                return;
+            }
+            LabelDownloaderAT labelDownloader = new LabelDownloaderAT(this);
+            labelDownloader.execute(uri);
         }
     }
 
@@ -154,12 +183,12 @@ public class TFliteAddFragment extends Fragment {
         return rootView;
     }
 
-    public void performFileSearch() {
+    public void performFileSearch(int requestCode) {
         Intent intent = new Intent(Intent.ACTION_OPEN_DOCUMENT);
         intent.addCategory(Intent.CATEGORY_OPENABLE);
         intent.setType("*/*");
-        startActivityForResult(intent, READ_REQUEST_CODE);
-        logger.log("Started ACTION_OPEN_DOCUMENT with READ_REQUEST_CODE");
+        startActivityForResult(intent, requestCode);
+        logger.log("Started ACTION_OPEN_DOCUMENT with READ_REQUEST_CODE: " + requestCode);
     }
 
     public void showDownloading(boolean isDownloading) {
@@ -174,6 +203,24 @@ public class TFliteAddFragment extends Fragment {
             tfliteAddStatus.setText("");
             logger.log("Download status views are invisible");
         }
+    }
+
+    private void setSegmentationMode() {
+        tfModelType = TFModelType.SEGMENTATION;
+        btnLabelsSelect.setVisibility(View.GONE);
+        labelsInfo.setVisibility(View.GONE);
+        logger.log("Selected TFModelType is: " + TFModelType.SEGMENTATION.toString());
+    }
+
+    private void setClassificationMode() {
+        tfModelType = TFModelType.CLASSIFICATION;
+        btnLabelsSelect.setVisibility(View.VISIBLE);
+        labelsInfo.setVisibility(View.VISIBLE);
+        if (null != labelsPath) {
+            String labelsFileInfo = this.getContext().getResources().getString(R.string.labels_file, new File(labelsPath).getName());
+            labelsInfo.setText(labelsFileInfo);
+        }
+        logger.log("Selected TFModelType is: " + TFModelType.CLASSIFICATION.toString());
     }
 
     public TFModelType getTfModelType() {
@@ -198,5 +245,13 @@ public class TFliteAddFragment extends Fragment {
 
     public void setSize_y(int size_y) {
         this.size_y = size_y;
+    }
+
+    public String getLabelsPath() {
+        return labelsPath;
+    }
+
+    public void setLabelsPath(String labelsPath) {
+        this.labelsPath = labelsPath;
     }
 }

@@ -3,9 +3,11 @@
     <string name="calculating">Calculating...</string>
     <string name="cancel">Cancel</string>
     <string name="close">Close</string>
+    <string name="select_labels">Select labels TXT</string>
     <string name="select">Select tflite file</string>
     <string name="canceling">Canceling...</string>
     <string name="segmentation_status">Processed %1$d\%%\nExpected time: %2$d min.</string>
+    <string name="labels_file">Labels file: %1$s</string>
     <string name="delete">Delete</string>
     <string name="add_new">Add</string>
     <string name="segmentation">Segmentation</string>
@@ -18,6 +20,7 @@
     <string name="tflite_add_empty_type_msg">Please select a model type.</string>
     <string name="tflite_add_empty_size_msg">Please enter a model input dimensions.</string>
     <string name="tflite_add_wrong_msg">Invalid file type. Please select a tflite file.</string>
+    <string name="tflite_add_labels_file_msg">Please select a labels file</string>
     <string name="tflite_add_downloading">Downloading TFLite file.</string>
     <string name="remove_current_tab">Remove current tab</string>
     <string name="remove_alert_title">Delete Tensorflow lite model?</string>
@@ -26,4 +29,5 @@
     <string name="tflite_add_type_info">Please select a model type</string>
     <string name="label_x">Image width</string>
     <string name="label_y">Image height</string>
+    <string name="labels_add_two_info">Please click the button below and select the label file.</string>
 </resources>

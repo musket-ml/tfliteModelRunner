@@ -50,12 +50,12 @@
             android:id="@+id/segmentation_rb"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:text="@string/segmentation"
-            android:layout_marginRight="8dp"
             android:layout_marginLeft="0dp"
             android:layout_marginTop="0dp"
-            android:layout_marginBottom="0dp" />
+            android:layout_marginRight="8dp"
+            android:layout_marginBottom="0dp"
+            android:layout_weight="1"
+            android:text="@string/segmentation" />
 
         <RadioButton
             android:id="@+id/classification_rb"
@@ -91,18 +91,18 @@
         android:text=""
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/tflite_add_one_info"
-        android:autofillHints="" />
+        app:layout_constraintTop_toBottomOf="@+id/tflite_add_one_info" />
 
     <TextView
-        android:id="@+id/tflite_add_two_info"
+        android:id="@+id/labels_add_two_info"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginStart="8dp"
         android:layout_marginTop="8dp"
         android:layout_marginEnd="8dp"
-        android:text="@string/tflite_add_two_info"
+        android:text="@string/labels_add_two_info"
         android:textSize="16sp"
+        android:visibility="gone"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/size_x" />
@@ -119,6 +119,33 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/tflite_add_title" />
+
+    <Button
+        android:id="@+id/btn_labels_select"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="8dp"
+        android:layout_marginEnd="8dp"
+        android:text="@string/select_labels"
+        android:visibility="gone"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/labels_add_two_info"
+        tools:visibility="invisible" />
+
+    <TextView
+        android:id="@+id/tflite_add_two_info"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="8dp"
+        android:layout_marginEnd="8dp"
+        android:text="@string/tflite_add_two_info"
+        android:textSize="16sp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/btn_labels_select" />
 
     <Button
         android:id="@+id/btn_tf_select"
@@ -139,8 +166,8 @@
         android:layout_marginStart="8dp"
         android:layout_marginTop="8dp"
         android:text=""
-        android:visibility="invisible"
         android:textSize="16sp"
+        android:visibility="invisible"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/tflite_progress_bar" />
@@ -166,14 +193,14 @@
         android:layout_marginStart="8dp"
         android:layout_marginTop="8dp"
         android:layout_marginEnd="4dp"
+        android:autofillHints=""
         android:ems="10"
         android:hint="@string/label_x"
         android:imeActionLabel="@string/label_y"
         android:inputType="numberSigned"
         app:layout_constraintEnd_toStartOf="@+id/size_y"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/tflite_add_three_info"
-        android:autofillHints="" />
+        app:layout_constraintTop_toBottomOf="@+id/tflite_add_three_info" />
 
     <EditText
         android:id="@+id/size_y"
@@ -183,6 +210,7 @@
         android:layout_marginTop="8dp"
         android:layout_marginEnd="8dp"
         android:layout_marginBottom="8dp"
+        android:autofillHints=""
         android:ems="10"
         android:hint="@string/label_y"
         android:inputType="numberSigned"
@@ -190,7 +218,6 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toEndOf="@+id/size_x"
         app:layout_constraintTop_toBottomOf="@+id/tflite_add_three_info"
-        app:layout_constraintVertical_bias="0.0"
-        android:autofillHints="" />
+        app:layout_constraintVertical_bias="0.0" />
 
 </android.support.constraint.ConstraintLayout>

@@ -66,7 +66,7 @@ public class ImageClassifier {
     private List<String> loadLabelList(Activity activity) throws IOException {
         List<String> labels = new ArrayList<String>();
         BufferedReader reader =
-                new BufferedReader(new InputStreamReader(activity.getAssets().open(getLabelPath())));
+                new BufferedReader(new InputStreamReader(new FileInputStream(tfLiteItem.getLabelsPath())));
         String line;
         while ((line = reader.readLine()) != null) {
             labels.add(line);
@@ -204,10 +204,6 @@ public class ImageClassifier {
 
     protected String getModelPath() {
         return tfLiteItem.getTfFilePath();
-    }
-
-    protected String getLabelPath() {
-        return "labels_mobilenet_quant_v1_224.txt";
     }
 
     protected int getNumBytesPerChannel() {

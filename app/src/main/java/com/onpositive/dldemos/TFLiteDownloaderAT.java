@@ -69,7 +69,9 @@ public class TFLiteDownloaderAT extends AsyncTask<Uri, Integer, Void> {
                     fragment.tfliteAddTitelTV.getText().toString(),
                     fragment.getTfModelType(),
                     fragment.getSize_x(),
-                    fragment.getSize_y()));
+                    fragment.getSize_y(),
+                    fragment.getLabelsPath()
+            ));
             logger.log("Downloaded file path: " + outFile
                     + "\n Title: " + fragment.tfliteAddTitelTV.getText().toString()
                     + "\nModelType: " + fragment.getTfModelType().toString()
