@@ -42,7 +42,6 @@ public class MainActivity extends AppCompatActivity {
         //TODO remove models tabs
 
         //FIXME bug on removing many tabs. Add few model -> reload app -> try to remove this models. Result: user can not remove model, also TFliteAddFragment is a model fragment.
-        //FIXME thumbnails empty at the end of list, if more than 12 result items
         //FIXME bug on fragment resume, thumbnails are empty for result items
         //FIXME wrong fragment type on add/delete new model
 

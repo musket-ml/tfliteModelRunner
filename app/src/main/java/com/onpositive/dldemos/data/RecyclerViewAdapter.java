@@ -2,7 +2,6 @@ package com.onpositive.dldemos.data;
 
 import android.content.Context;
 import android.content.Intent;
-import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -16,6 +15,9 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.view.ActionMode;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.bumptech.glide.Glide;
+import com.bumptech.glide.load.engine.DiskCacheStrategy;
+import com.bumptech.glide.request.RequestOptions;
 import com.onpositive.dldemos.MLDemoApp;
 import com.onpositive.dldemos.R;
 import com.onpositive.dldemos.tools.Logger;
@@ -98,7 +100,13 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
     public void onBindViewHolder(ViewHolder holder, int position) {
         ResultItem item = itemList.get(position);
         holder.fileNameTV.setText(item.getFileName());
-        holder.previewIV.setImageBitmap(BitmapFactory.decodeFile(item.getThumbnailPath()));
+        RequestOptions requestOptions = new RequestOptions()
+                .diskCacheStrategy(DiskCacheStrategy.ALL)
+                .override(320, 320);
+        Glide.with(context)
+                .load(item.getThumbnailPath())
+                .apply(requestOptions)
+                .into(holder.previewIV);
         log.log("onBindViewHolder for position: " + position);
     }
 
