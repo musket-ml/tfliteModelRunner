@@ -6,7 +6,8 @@ import android.content.res.AssetManager;
 import android.graphics.Bitmap;
 import android.os.SystemClock;
 import android.os.Trace;
-import android.support.annotation.NonNull;
+
+import androidx.annotation.NonNull;
 
 import com.onpositive.dldemos.data.TFLiteItem;
 import com.onpositive.dldemos.segmentation.GpuDelegateHelper;

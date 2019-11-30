@@ -3,9 +3,10 @@ package com.onpositive.dldemos;
 import android.content.Intent;
 import android.os.Bundle;
 import android.provider.MediaStore;
-import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.widget.Button;
+
+import androidx.appcompat.app.AppCompatActivity;
 
 import com.camerakit.CameraKitView;
 import com.onpositive.dldemos.camera.MediaContainer;

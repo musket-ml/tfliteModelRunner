@@ -3,7 +3,8 @@ package com.onpositive.dldemos;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.AsyncTask;
-import android.support.annotation.Nullable;
+
+import androidx.annotation.Nullable;
 
 import com.onpositive.dldemos.classification.ImageClassifier;
 import com.onpositive.dldemos.data.ClassificationResultItem;

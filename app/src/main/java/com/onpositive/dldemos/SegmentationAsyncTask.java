@@ -2,8 +2,9 @@ package com.onpositive.dldemos;
 
 import android.graphics.Bitmap;
 import android.os.AsyncTask;
-import android.support.annotation.Nullable;
 import android.view.View;
+
+import androidx.annotation.Nullable;
 
 import com.onpositive.dldemos.data.ContentType;
 import com.onpositive.dldemos.data.ResultItem;

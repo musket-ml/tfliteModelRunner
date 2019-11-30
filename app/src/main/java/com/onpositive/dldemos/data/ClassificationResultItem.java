@@ -1,7 +1,7 @@
 package com.onpositive.dldemos.data;
 
-import android.arch.persistence.room.Entity;
-import android.arch.persistence.room.TypeConverters;
+import androidx.room.Entity;
+import androidx.room.TypeConverters;
 
 import com.onpositive.dldemos.classification.ImageClassifier;
 import com.onpositive.dldemos.data.TypeConverters.ClassificationResultItemConverter;

@@ -1,6 +1,6 @@
 package com.onpositive.dldemos.data.TypeConverters;
 
-import android.arch.persistence.room.TypeConverter;
+import androidx.room.TypeConverter;
 
 import com.onpositive.dldemos.data.TFModelType;
 
