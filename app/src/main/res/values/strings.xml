@@ -30,4 +30,5 @@
     <string name="label_x">Image width</string>
     <string name="label_y">Image height</string>
     <string name="labels_add_two_info">Please click the button below and select the label file.</string>
+    <string name="object_detection">Object detection</string>
 </resources>
