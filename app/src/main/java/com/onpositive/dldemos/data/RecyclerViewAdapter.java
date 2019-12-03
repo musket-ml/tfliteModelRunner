@@ -23,8 +23,10 @@ import com.onpositive.dldemos.R;
 import com.onpositive.dldemos.tools.Logger;
 
 import java.io.File;
+import java.text.SimpleDateFormat;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 
 import butterknife.BindView;
@@ -99,6 +101,7 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
     @Override
     public void onBindViewHolder(ViewHolder holder, int position) {
         ResultItem item = itemList.get(position);
+        holder.dateTV.setText(new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.ENGLISH).format(item.getLastModified()));
         holder.fileNameTV.setText(item.getFileName());
         RequestOptions requestOptions = new RequestOptions()
                 .diskCacheStrategy(DiskCacheStrategy.ALL)
@@ -126,6 +129,8 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
     class ViewHolder extends RecyclerView.ViewHolder {
         @BindView(R.id.file_nameTV)
         TextView fileNameTV;
+        @BindView(R.id.info_tv)
+        TextView dateTV;
         @BindView(R.id.segmentation_previewIV)
         ImageView previewIV;
 

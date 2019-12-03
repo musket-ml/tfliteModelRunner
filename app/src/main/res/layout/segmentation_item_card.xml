@@ -2,7 +2,7 @@
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:id="@+id/card_view"
     android:layout_width="match_parent"
-    android:layout_height="96dp"
+    android:layout_height="72dp"
     card_view:cardUseCompatPadding="true"
     card_view:cardCornerRadius="8dp"
     android:layout_marginBottom="4dp">
@@ -13,7 +13,7 @@
 
         <ImageView
             android:id="@+id/segmentation_previewIV"
-            android:layout_width="96dp"
+            android:layout_width="56dp"
             android:layout_height="match_parent"
             android:layout_marginLeft="8dp"
             android:layout_marginBottom="8dp"
@@ -26,24 +26,27 @@
             android:id="@+id/file_nameTV"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginStart="8dp"
+            android:layout_marginStart="16dp"
             android:layout_marginTop="8dp"
             android:layout_marginEnd="8dp"
+            android:textSize="12sp"
+            card_view:layout_constraintHorizontal_bias="0"
             card_view:layout_constraintEnd_toEndOf="parent"
             card_view:layout_constraintStart_toEndOf="@+id/segmentation_previewIV"
-            card_view:layout_constraintTop_toTopOf="parent" />
+            card_view:layout_constraintTop_toBottomOf="@id/info_tv" />
 
         <TextView
             android:id="@+id/info_tv"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginStart="8dp"
+            android:layout_marginStart="16dp"
             android:layout_marginTop="8dp"
             android:layout_marginEnd="8dp"
-            android:visibility="invisible"
+            android:textSize="16sp"
+            card_view:layout_constraintHorizontal_bias="0"
             card_view:layout_constraintEnd_toEndOf="parent"
             card_view:layout_constraintStart_toEndOf="@+id/segmentation_previewIV"
-            card_view:layout_constraintTop_toBottomOf="@+id/file_nameTV" />
+            card_view:layout_constraintTop_toTopOf="parent" />
 
 
     </androidx.constraintlayout.widget.ConstraintLayout>
