@@ -8,6 +8,8 @@ Now supported:
 
 The application has a demo segmentation model.
 
+![](/media/tf-model-runner_small.gif)
+
 ## Usage
 
 Only TensorFlow light models are applicable. To convert a TensorFlow model to a TensorFlow light model see [guide.](https://www.tensorflow.org/lite/guide/get_started#2_convert_the_model_format)
@@ -22,17 +24,22 @@ Only TensorFlow light models are applicable. To convert a TensorFlow model to a 
 
 After file loading, a new tab with the specified name will be created.
 
+![](/media/tf-model-runner_new_model_small.gif)
+
 ### Remove model
 
 1) Click on the desired tab.
 2) Open options menu and select `Remove current tab`
 
+![](/media/tf-model-runner_remove_small.gif)
 
 ### Run model
 
 1) Click on the desired tab.
 2) Click on the camera button.
 3) Take a photo or video. Wait for the end of processing. 
+
+![](/media/tf-model-runner_run_small.gif)
 
 ### View results
 
