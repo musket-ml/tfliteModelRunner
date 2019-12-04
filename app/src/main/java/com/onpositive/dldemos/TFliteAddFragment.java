@@ -77,15 +77,18 @@ public class TFliteAddFragment extends Fragment {
         return fragment;
     }
 
-    @OnCheckedChanged({R.id.segmentation_rb, R.id.classification_rb})
+    @OnCheckedChanged({R.id.segmentation_rb, R.id.classification_rb, R.id.object_detection_rb})
     public void onRadioButtonCheckChanged(RadioButton radioButton, boolean checked) {
         if (checked) {
             switch (radioButton.getId()) {
                 case R.id.segmentation_rb:
-                    setSegmentationMode();
+                    disableLabelLoad();
                     break;
                 case R.id.classification_rb:
-                    setClassificationMode();
+                    enableLabelLoad();
+                    break;
+                case R.id.object_detection_rb:
+                    enableLabelLoad();
                     break;
             }
         }
@@ -125,7 +128,7 @@ public class TFliteAddFragment extends Fragment {
                     errMsg += getContext().getString(R.string.tflite_add_empty_size_msg) + "\n";
                     hasErr = true;
                 }
-                if (tfModelType == TFModelType.CLASSIFICATION && labelsPath == null) {
+                if ((tfModelType == TFModelType.CLASSIFICATION && labelsPath == null) || (tfModelType == TFModelType.OBJECT_DETECTION && labelsPath == null)) {
                     errMsg += getContext().getString(R.string.tflite_add_labels_file_msg) + "\n";
                     hasErr = true;
                 }
@@ -206,14 +209,14 @@ public class TFliteAddFragment extends Fragment {
         }
     }
 
-    private void setSegmentationMode() {
+    private void disableLabelLoad() {
         tfModelType = TFModelType.SEGMENTATION;
         btnLabelsSelect.setVisibility(View.GONE);
         labelsInfo.setVisibility(View.GONE);
         logger.log("Selected TFModelType is: " + TFModelType.SEGMENTATION.toString());
     }
 
-    private void setClassificationMode() {
+    private void enableLabelLoad() {
         tfModelType = TFModelType.CLASSIFICATION;
         btnLabelsSelect.setVisibility(View.VISIBLE);
         labelsInfo.setVisibility(View.VISIBLE);
