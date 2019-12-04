@@ -9,7 +9,6 @@ import androidx.fragment.app.FragmentPagerAdapter;
 import com.onpositive.dldemos.data.AppDatabase;
 import com.onpositive.dldemos.data.TFLiteItem;
 import com.onpositive.dldemos.data.TFLiteItemDao;
-import com.onpositive.dldemos.data.TFModelType;
 import com.onpositive.dldemos.tools.Logger;
 
 import java.util.List;
@@ -37,10 +36,13 @@ public class SectionsPagerAdapter extends FragmentPagerAdapter {
             return TFliteAddFragment.newInstance(position);
         }
         TFLiteItem tfLiteItem = tfLiteItems.get(position);
-        if (tfLiteItem.getModelType() == TFModelType.CLASSIFICATION) {
-            return ClassificationFragment.newInstance(tfLiteItem, position);
-        } else if (tfLiteItem.getModelType() == TFModelType.SEGMENTATION) {
-            return SegmentationFragment.newInstance(tfLiteItem, position);
+        switch (tfLiteItem.getModelType()) {
+            case SEGMENTATION:
+                return SegmentationFragment.newInstance(tfLiteItem, position);
+            case CLASSIFICATION:
+                return ClassificationFragment.newInstance(tfLiteItem, position);
+            case OBJECT_DETECTION:
+                return DetectionFragment.newInstance(tfLiteItem, position);
         }
         return null;
     }
