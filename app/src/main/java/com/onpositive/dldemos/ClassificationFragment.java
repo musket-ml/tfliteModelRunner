@@ -125,9 +125,9 @@ public class ClassificationFragment extends Fragment {
             classificationRV.setAdapter(classifyRvAdapter);
             log.log("Classification Recycler View content uploaded");
         } catch (Exception e) {
-            log.error("Segmentation initialization failed:\n" + e.getMessage());
+            log.error("Classification initialization failed:\n" + e.getMessage());
         }
-        log.log("SegmentationFragment created");
+        log.log("ClassificationFragment created");
         return rootView;
     }
 
