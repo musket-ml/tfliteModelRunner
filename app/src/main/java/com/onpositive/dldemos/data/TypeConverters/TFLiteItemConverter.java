@@ -13,6 +13,8 @@ public class TFLiteItemConverter {
                 return "SEGMENTATION";
             case CLASSIFICATION:
                 return "CLASSIFICATION";
+            case OBJECT_DETECTION:
+                return "OBJECT_DETECTION";
         }
         return null;
     }
@@ -24,6 +26,8 @@ public class TFLiteItemConverter {
                 return TFModelType.SEGMENTATION;
             case "CLASSIFICATION":
                 return TFModelType.CLASSIFICATION;
+            case "OBJECT_DETECTION":
+                return TFModelType.OBJECT_DETECTION;
         }
         return null;
     }
