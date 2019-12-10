@@ -82,12 +82,15 @@ public class TFliteAddFragment extends Fragment {
         if (checked) {
             switch (radioButton.getId()) {
                 case R.id.segmentation_rb:
+                    tfModelType = TFModelType.SEGMENTATION;
                     disableLabelLoad();
                     break;
                 case R.id.classification_rb:
+                    tfModelType = TFModelType.CLASSIFICATION;
                     enableLabelLoad();
                     break;
                 case R.id.object_detection_rb:
+                    tfModelType = TFModelType.OBJECT_DETECTION;
                     enableLabelLoad();
                     break;
             }
@@ -210,14 +213,12 @@ public class TFliteAddFragment extends Fragment {
     }
 
     private void disableLabelLoad() {
-        tfModelType = TFModelType.SEGMENTATION;
         btnLabelsSelect.setVisibility(View.GONE);
         labelsInfo.setVisibility(View.GONE);
         logger.log("Selected TFModelType is: " + TFModelType.SEGMENTATION.toString());
     }
 
     private void enableLabelLoad() {
-        tfModelType = TFModelType.CLASSIFICATION;
         btnLabelsSelect.setVisibility(View.VISIBLE);
         labelsInfo.setVisibility(View.VISIBLE);
         if (null != labelsPath) {
