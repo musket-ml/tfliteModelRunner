@@ -152,7 +152,7 @@ public class ImageDetector {
             // SSD Mobilenet V1 Model assumes class 0 is background class
             // in label file and class labels start from 1 to number_of_classes+1,
             // while outputClasses correspond to class index from 0 to number_of_classes
-            int labelOffset = 1;
+            int labelOffset = 0;
             recognitions.add(
                     new ObjectDetection(
                             labels.get((int) outputClasses[0][i] + labelOffset),
