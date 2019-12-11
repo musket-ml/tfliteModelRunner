@@ -25,6 +25,23 @@ public class DetectionAsyncTask extends AsyncTask<ContentType, Integer, Detectio
 
     private static final float FILTER_VALUE = 0.5f;
     private static final float TEXT_SIZE_DIP = 18;
+    private static final int[] COLORS = {
+            Color.BLUE,
+            Color.RED,
+            Color.GREEN,
+            Color.YELLOW,
+            Color.CYAN,
+            Color.MAGENTA,
+            Color.WHITE,
+            Color.parseColor("#55FF55"),
+            Color.parseColor("#FFA500"),
+            Color.parseColor("#FF8888"),
+            Color.parseColor("#AAAAFF"),
+            Color.parseColor("#FFFFAA"),
+            Color.parseColor("#55AAAA"),
+            Color.parseColor("#AA33AA"),
+            Color.parseColor("#0D0068")
+    };
     private static Logger log = new Logger(DetectionAsyncTask.class);
     DetectionResultItem detectionRI = null;
     ContentType contentType;
@@ -134,6 +151,9 @@ public class DetectionAsyncTask extends AsyncTask<ContentType, Integer, Detectio
         textPaint.setAlpha(255);
 
         for (ImageDetector.ObjectDetection recognition : recognitions) {
+            int color = COLORS[recognitions.indexOf(recognition)];
+            paint.setColor(color);
+            textPaint.setColor(color);
             if (FILTER_VALUE > recognition.getConfidence()) {
                 continue;
             }
