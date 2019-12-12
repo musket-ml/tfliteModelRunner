@@ -7,6 +7,29 @@
     android:layout_height="match_parent"
     tools:context=".ClassificationFragment">
 
+    <ProgressBar
+        android:id="@+id/classificationProgressBar"
+        style="?android:attr/progressBarStyle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerInParent="true"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="8dp"
+        android:visibility="invisible"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <TextView
+        android:id="@+id/classificationStatusTV"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="16dp"
+        android:text="@string/calculating"
+        android:visibility="invisible"
+        app:layout_constraintStart_toEndOf="@+id/classificationProgressBar"
+        app:layout_constraintTop_toTopOf="parent" />
+
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/classification_rv"
         android:layout_width="match_parent"

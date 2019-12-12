@@ -3,6 +3,7 @@ package com.onpositive.dldemos;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.AsyncTask;
+import android.view.View;
 
 import androidx.annotation.Nullable;
 
@@ -65,12 +66,19 @@ public class ClassificationAsyncTask extends AsyncTask<ContentType, Integer, Cla
     @Override
     protected void onPreExecute() {
         super.onPreExecute();
-        log.log("Segmentation Async Task onPreExecute");
+        fragment.moveRVDown(fragment.classificationRV);
+        fragment.progressBar.setVisibility(View.VISIBLE);
+        fragment.progressStatusTV.setText(R.string.calculating);
+        fragment.progressStatusTV.setVisibility(View.VISIBLE);
+        log.log("Classification Async Task onPreExecute");
     }
 
     @Override
     protected void onPostExecute(ClassificationResultItem classificationResultItem) {
         super.onPostExecute(classificationResultItem);
+        fragment.moveRVUp(fragment.classificationRV);
+        fragment.progressBar.setVisibility(View.INVISIBLE);
+        fragment.progressStatusTV.setVisibility(View.INVISIBLE);
 
         fragment.classifyResultList.add(classificationResultItem);
         Collections.sort(fragment.classifyResultList);
