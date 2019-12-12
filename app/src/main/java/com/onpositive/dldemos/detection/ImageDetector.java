@@ -258,7 +258,7 @@ public class ImageDetector {
         return labels.size();
     }
 
-    public static class ObjectDetection {
+    public static class ObjectDetection implements Comparable<ObjectDetection> {
 
         private final String title;
         private final Float confidence;
@@ -299,11 +299,12 @@ public class ImageDetector {
                 resultString += String.format("(%.1f%%) ", confidence * 100.0f);
             }
 
-            if (location != null) {
-                resultString += location + " ";
-            }
-
             return resultString.trim();
+        }
+
+        @Override
+        public int compareTo(ObjectDetection objectDetection) {
+            return this.confidence.compareTo(objectDetection.confidence);
         }
     }
 }
