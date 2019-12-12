@@ -24,10 +24,11 @@ import com.onpositive.dldemos.tools.Logger;
 
 import java.io.File;
 import java.text.SimpleDateFormat;
-import java.util.HashMap;
+import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.TreeMap;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -38,7 +39,7 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
 
     private Context context;
     private List<ResultItem> itemList;
-    private Map<Integer, RecyclerViewAdapter.ViewHolder> selectedResultItems = new HashMap<>();
+    private Map<Integer, RecyclerViewAdapter.ViewHolder> selectedResultItems = new TreeMap<>(Collections.reverseOrder());
     private Logger log = new Logger(this.getClass());
     private boolean isSelectionMode = false;
     private ActionMode.Callback actionModeCallbacks = new ActionMode.Callback() {

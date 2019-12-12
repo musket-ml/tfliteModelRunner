@@ -24,9 +24,10 @@ import com.onpositive.dldemos.classification.ImageClassifier;
 import com.onpositive.dldemos.tools.Logger;
 
 import java.io.File;
-import java.util.HashMap;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.TreeMap;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -37,7 +38,7 @@ public class ClassificationRVAdapter extends RecyclerView.Adapter<Classification
 
     private Context context;
     private List<? extends ResultItem> itemList;
-    private Map<Integer, ClassificationRVAdapter.ViewHolder> selectedResultItems = new HashMap<>();
+    private Map<Integer, ClassificationRVAdapter.ViewHolder> selectedResultItems = new TreeMap<>(Collections.reverseOrder());
     private Logger log = new Logger(this.getClass());
     private boolean isSelectionMode = false;
     private ActionMode.Callback actionModeCallbacks = new ActionMode.Callback() {
