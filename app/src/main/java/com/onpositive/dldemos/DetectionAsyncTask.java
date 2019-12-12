@@ -7,6 +7,7 @@ import android.graphics.Color;
 import android.graphics.Paint;
 import android.os.AsyncTask;
 import android.util.TypedValue;
+import android.view.View;
 
 import androidx.annotation.Nullable;
 
@@ -89,13 +90,19 @@ public class DetectionAsyncTask extends AsyncTask<ContentType, Integer, Detectio
     @Override
     protected void onPreExecute() {
         super.onPreExecute();
+        fragment.moveRVDown(fragment.detectionRV);
+        fragment.progressBar.setVisibility(View.VISIBLE);
+        fragment.progressStatusTV.setText(R.string.calculating);
+        fragment.progressStatusTV.setVisibility(View.VISIBLE);
         log.log("Object Detection Async Task onPreExecute");
     }
 
     @Override
     protected void onPostExecute(DetectionResultItem detectionResultItem) {
         super.onPostExecute(detectionResultItem);
-// TODO fix recycler view update and progress showing
+        fragment.moveRVUp(fragment.detectionRV);
+        fragment.progressBar.setVisibility(View.INVISIBLE);
+        fragment.progressStatusTV.setVisibility(View.INVISIBLE);
 
         fragment.detectionResultList.add(detectionResultItem);
         Collections.sort(fragment.detectionResultList);

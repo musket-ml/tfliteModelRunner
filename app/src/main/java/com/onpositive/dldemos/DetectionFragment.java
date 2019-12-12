@@ -14,6 +14,8 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.ProgressBar;
+import android.widget.TextView;
 
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
@@ -52,6 +54,10 @@ public class DetectionFragment extends Fragment {
     private static Logger log = new Logger(DetectionFragment.class);
     @BindView(R.id.photoBtn)
     public Button makePhotoBtn;
+    @BindView(R.id.detectionProgressBar)
+    public ProgressBar progressBar;
+    @BindView(R.id.detectionStatusTV)
+    public TextView progressStatusTV;
     @BindView(R.id.detection_rv)
     RecyclerView detectionRV;
     RecyclerView.Adapter detectionRvAdapter;
@@ -266,5 +272,29 @@ public class DetectionFragment extends Fragment {
 
     public void setCurrentPhotoPath(String currentPhotoPath) {
         this.currentPhotoPath = currentPhotoPath;
+    }
+
+    public void moveRVDown(RecyclerView rv) {
+        setMargins(rv, 8, 56, 8, 0);
+        log.log("Recycler View moved down");
+    }
+
+    public void moveRVUp(RecyclerView rv) {
+        setMargins(rv, 8, 8, 8, 0);
+        log.log("Recycler View moved up");
+    }
+
+    private void setMargins(View v, int l, int t, int r, int b) {
+        final float scale = this.getActivity().getBaseContext().getResources().getDisplayMetrics().density;
+        int left = (int) (l * scale + 0.5f);
+        int right = (int) (r * scale + 0.5f);
+        int top = (int) (t * scale + 0.5f);
+        int bottom = (int) (b * scale + 0.5f);
+        if (v.getLayoutParams() instanceof ViewGroup.MarginLayoutParams) {
+            ViewGroup.MarginLayoutParams p = (ViewGroup.MarginLayoutParams) v.getLayoutParams();
+            p.setMargins(left, top, right, bottom);
+            v.requestLayout();
+        }
+        log.log("Recycler View top marging changed to: " + top + "dp");
     }
 }

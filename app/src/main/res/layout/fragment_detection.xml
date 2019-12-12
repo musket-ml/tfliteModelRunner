@@ -7,6 +7,29 @@
     android:layout_height="match_parent"
     tools:context=".DetectionFragment">
 
+    <ProgressBar
+        android:id="@+id/detectionProgressBar"
+        style="?android:attr/progressBarStyle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerInParent="true"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="8dp"
+        android:visibility="invisible"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <TextView
+        android:id="@+id/detectionStatusTV"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="16dp"
+        android:text="@string/calculating"
+        android:visibility="invisible"
+        app:layout_constraintStart_toEndOf="@+id/detectionProgressBar"
+        app:layout_constraintTop_toTopOf="parent" />
+
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/detection_rv"
         android:layout_width="match_parent"
