@@ -19,6 +19,7 @@ import com.onpositive.dldemos.tools.Utils;
 
 import java.io.File;
 import java.io.FileOutputStream;
+import java.util.Collections;
 import java.util.List;
 
 public class DetectionAsyncTask extends AsyncTask<ContentType, Integer, DetectionResultItem> {
@@ -96,10 +97,10 @@ public class DetectionAsyncTask extends AsyncTask<ContentType, Integer, Detectio
         super.onPostExecute(detectionResultItem);
 // TODO fix recycler view update and progress showing
 
-//        fragment.detectionResultList.add(detectionResultItem);
-//        Collections.sort(fragment.detectionResultList);
-//        Collections.reverse(fragment.detectionResultList);
-//        fragment.classifyRvAdapter.notifyDataSetChanged();
+        fragment.detectionResultList.add(detectionResultItem);
+        Collections.sort(fragment.detectionResultList);
+        Collections.reverse(fragment.detectionResultList);
+        fragment.detectionRvAdapter.notifyDataSetChanged();
         log.log("'onPostExecute' executed");
     }
 
