@@ -72,6 +72,7 @@ public class DetectionAsyncTask extends AsyncTask<ContentType, Integer, Detectio
                     stream.close();
                     String thumbnailPath = Utils.createThumbnail(fragment.getActivity(), resultImageFile.getAbsolutePath(), ContentType.IMAGE);
                     detectionRI = new DetectionResultItem(resultImageFile.getAbsolutePath(), ContentType.IMAGE, thumbnailPath);
+                    detectionRI.setRecognitionResultList(recognitions);
                     deleteFile(new File(fragment.getCurrentPhotoPath()));
                     log.log("Image segmented successfully. Image file path:" + resultImageFile.getAbsolutePath());
                 } catch (Exception e) {
@@ -151,14 +152,15 @@ public class DetectionAsyncTask extends AsyncTask<ContentType, Integer, Detectio
         textPaint.setAlpha(255);
 
         for (ImageDetector.ObjectDetection recognition : recognitions) {
-            int color = COLORS[recognitions.indexOf(recognition)];
+            int colorNumber = recognitions.indexOf(recognition) % COLORS.length;
+            int color = COLORS[colorNumber];
             paint.setColor(color);
             textPaint.setColor(color);
             if (FILTER_VALUE > recognition.getConfidence()) {
                 continue;
             }
             if (recognition.getTitle().length() > 0) {
-                canvas.drawText(recognition.getTitle(),
+                canvas.drawText(recognition.toString(),
                         recognition.getLocation().left + textSizePx,
                         recognition.getLocation().top + textSizePx,
                         textPaint);
