@@ -21,7 +21,7 @@ public class TFLiteItem {
     private TFModelType modelType;
     private int size_x;
     private int size_y;
-    private String labelsPath = null;
+    private String labelsPath = "";
 
     public TFLiteItem() {
     }

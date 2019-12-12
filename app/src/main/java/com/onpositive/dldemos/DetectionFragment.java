@@ -248,6 +248,9 @@ public class DetectionFragment extends Fragment {
         File modelFile = new File(tfLiteItem.getTfFilePath());
         if (modelFile.exists())
             modelFile.delete();
+        File labelsFile = new File(tfLiteItem.getLabelsPath());
+        if (labelsFile.exists())
+            labelsFile.delete();
         MLDemoApp.getInstance().getDatabase().tfLiteItemDao().delete(tfLiteItem);
 
         ((MainActivity) getActivity()).getSectionsPagerAdapter().refreshDataSet();
