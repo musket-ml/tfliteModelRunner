@@ -23,8 +23,8 @@ import androidx.recyclerview.widget.DefaultItemAnimator;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.onpositive.dldemos.data.ClassificationRVAdapter;
 import com.onpositive.dldemos.data.ContentType;
+import com.onpositive.dldemos.data.DetectionRVAdapter;
 import com.onpositive.dldemos.data.DetectionResultItem;
 import com.onpositive.dldemos.data.DetectionResultItemDao;
 import com.onpositive.dldemos.data.ResultItem;
@@ -54,7 +54,7 @@ public class DetectionFragment extends Fragment {
     public Button makePhotoBtn;
     @BindView(R.id.detection_rv)
     RecyclerView detectionRV;
-    RecyclerView.Adapter classifyRvAdapter; //TODO create detection adapter
+    RecyclerView.Adapter detectionRvAdapter;
     List<DetectionResultItem> detectionResultList;
     private String currentPhotoPath;
     private DetectionAsyncTask dat;
@@ -121,8 +121,8 @@ public class DetectionFragment extends Fragment {
             detectionResultList = resultItemDao.getAllByParentTF(tfLiteItem.getTfFilePath());
             Collections.sort(detectionResultList);
             Collections.reverse(detectionResultList);
-            classifyRvAdapter = new ClassificationRVAdapter(this.getContext(), detectionResultList);
-            detectionRV.setAdapter(classifyRvAdapter);
+            detectionRvAdapter = new DetectionRVAdapter(this.getContext(), detectionResultList);
+            detectionRV.setAdapter(detectionRvAdapter);
             log.log("Detection Recycler View content uploaded");
         } catch (Exception e) {
             log.error("Detection initialization failed:\n" + e.getMessage());
