@@ -1,11 +1,12 @@
-<androidx.cardview.widget.CardView xmlns:card_view="http://schemas.android.com/apk/res-auto"
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:card_view="http://schemas.android.com/apk/res-auto"
     android:id="@+id/card_view"
     android:layout_width="match_parent"
     android:layout_height="72dp"
-    card_view:cardUseCompatPadding="true"
-    card_view:cardCornerRadius="8dp"
-    android:layout_marginBottom="4dp">
+    android:layout_marginBottom="4dp"
+    card_view:cardCornerRadius="0dp"
+    card_view:cardElevation="0dp"
+    card_view:cardUseCompatPadding="false">
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
@@ -16,8 +17,8 @@
             android:layout_width="56dp"
             android:layout_height="match_parent"
             android:layout_marginLeft="8dp"
-            android:layout_marginBottom="8dp"
             android:layout_marginTop="8dp"
+            android:layout_marginBottom="8dp"
             card_view:layout_constraintBottom_toBottomOf="parent"
             card_view:layout_constraintLeft_toLeftOf="parent"
             card_view:layout_constraintTop_toTopOf="parent" />
@@ -30,8 +31,8 @@
             android:layout_marginTop="8dp"
             android:layout_marginEnd="8dp"
             android:textSize="12sp"
-            card_view:layout_constraintHorizontal_bias="0"
             card_view:layout_constraintEnd_toEndOf="parent"
+            card_view:layout_constraintHorizontal_bias="0"
             card_view:layout_constraintStart_toEndOf="@+id/segmentation_previewIV"
             card_view:layout_constraintTop_toBottomOf="@id/info_tv" />
 
@@ -43,8 +44,8 @@
             android:layout_marginTop="8dp"
             android:layout_marginEnd="8dp"
             android:textSize="16sp"
-            card_view:layout_constraintHorizontal_bias="0"
             card_view:layout_constraintEnd_toEndOf="parent"
+            card_view:layout_constraintHorizontal_bias="0"
             card_view:layout_constraintStart_toEndOf="@+id/segmentation_previewIV"
             card_view:layout_constraintTop_toTopOf="parent" />
 
