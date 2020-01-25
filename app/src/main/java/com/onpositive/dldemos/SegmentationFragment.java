@@ -166,6 +166,10 @@ public class SegmentationFragment extends Fragment {
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
+        if (resultCode != RESULT_OK) {
+            log.log("onActivityResult failed");
+            return;
+        }
         Segmentator segmentator = null;
         try {
             segmentator = new VideoSegmentator(this.getActivity(), tfLiteItem);
@@ -174,10 +178,6 @@ public class SegmentationFragment extends Fragment {
             log.log("VideoSegmentator initialization failed " + e.getMessage());
         }
         sat = new SegmentationAsyncTask(segmentator, this);
-        if (resultCode != RESULT_OK) {
-            log.log("onActivityResult failed");
-            return;
-        }
         switch (requestCode) {
             case REQUEST_IMAGE_CAPTURE:
                 log.log(" got result from camera. currentPhotoPath: " + currentPhotoPath);
