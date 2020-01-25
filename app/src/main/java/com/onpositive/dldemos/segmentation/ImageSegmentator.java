@@ -29,13 +29,38 @@ import java.util.ArrayList;
 import java.util.List;
 
 public abstract class ImageSegmentator implements Segmentator {
-    private final int PIXEL_SIZE = 3;
-    private final double GOOD_PROB_THRESHOLD = 0.5;
-    private int SIZE_X;
-    private int SIZE_Y;
+    public static final int[] colors = {
+            Color.argb(0, 0, 0, 0),
+            Color.parseColor("#88FFB300"), // Vivid Yellow
+            Color.parseColor("#88803E75"), // Strong Purple
+            Color.parseColor("#88FF6800"), // Vivid Orange
+            Color.parseColor("#88A6BDD7"), // Very Light Blue
+            Color.parseColor("#88C10020"), // Vivid Red
+            Color.parseColor("#88CEA262"), // Grayish Yellow
+            Color.parseColor("#88817066"), // Medium Gray
+            Color.parseColor("#88007D34"), // Vivid Green
+            Color.parseColor("#88F6768E"), // Strong Purplish Pink
+            Color.parseColor("#8800538A"), // Strong Blue
+            Color.parseColor("#88FF7A5C"), // Strong Yellowish Pink
+            Color.parseColor("#8853377A"), // Strong Violet
+            Color.parseColor("#88FF8E00"), // Vivid Orange Yellow
+            Color.parseColor("#88B32851"), // Strong Purplish Red
+            Color.parseColor("#88F4C800"), // Vivid Greenish Yellow
+            Color.parseColor("#887F180D"), // Strong Reddish Brown
+            Color.parseColor("#8893AA00"), // Vivid Yellowish Green
+            Color.parseColor("#88593315"), // Deep Yellowish Brown
+            Color.parseColor("#88F13A13"), // Vivid Reddish Orange
+            Color.parseColor("#88232C16"), // Dark Olive Green
+            Color.parseColor("#8800A1C2")  // Vivid Blue
+    };
+    private final int PIXEL_SIZE;
+    private final double GOOD_PROB_THRESHOLD = 0.1;
     private final Interpreter.Options tfliteOptions = new Interpreter.Options();
     protected volatile Interpreter interpreter;
     protected Logger log = new Logger(this.getClass());
+    private int OUTPUT_CLASS_COUNT = 1;
+    private int SIZE_X;
+    private int SIZE_Y;
     private MappedByteBuffer tfliteModel;
     private GpuDelegate gpuDelegate = null;
     private Activity activity;
@@ -51,7 +76,9 @@ public abstract class ImageSegmentator implements Segmentator {
         useGPU();
         tfliteOptions.setNumThreads(Runtime.getRuntime().availableProcessors() + 1);
         interpreter = new Interpreter(tfliteModel, tfliteOptions);
-
+        PIXEL_SIZE = interpreter.getInputTensor(0).shape()[3];
+        if (interpreter.getOutputTensor(0).shape().length > 3)
+            OUTPUT_CLASS_COUNT = interpreter.getOutputTensor(0).shape()[3];
         log.log(this.getClass().getSimpleName() + " initialized.");
     }
 
@@ -85,12 +112,12 @@ public abstract class ImageSegmentator implements Segmentator {
     public List<Bitmap> getSegmentationMaskList(List<Bitmap> inputImagesList) {
         batchSize = inputImagesList.size();
         List<Bitmap> resizedImagesList = scaleBitmaps(inputImagesList);
-        ByteBuffer segmentationMaskBB = ByteBuffer.allocate(SIZE_X * SIZE_Y * 4 * batchSize);
+        ByteBuffer segmentationMaskBB = ByteBuffer.allocate(SIZE_X * SIZE_Y * 4 * OUTPUT_CLASS_COUNT * batchSize);
         int[] dimensions = {batchSize, SIZE_X, SIZE_Y, PIXEL_SIZE};
         interpreter.resizeInput(0, dimensions);
         interpreter.run(convertBitmapListToByteBuffer(resizedImagesList), segmentationMaskBB);
         log.log("Interpreter returned segmentation mask prediction");
-        return convertByteBufferToBitmapList(segmentationMaskBB, inputImagesList.get(0).getWidth(), inputImagesList.get(0).getHeight());
+        return convertByteBufferToColorBitmapList(segmentationMaskBB, inputImagesList.get(0).getWidth(), inputImagesList.get(0).getHeight());
     }
 
     public List<Bitmap> scaleBitmaps(List<Bitmap> inputImagesList) {
@@ -149,6 +176,35 @@ public abstract class ImageSegmentator implements Segmentator {
             Bitmap segmentationMask = Bitmap.createScaledBitmap(bitmap, width, height, true);
             bitmapMaskList.add(segmentationMask);
         }
+        log.log("Byte buffer converted to the Bitmaps. (Segmentation masks are converted to the Bitmaps)");
+        return bitmapMaskList;
+    }
+
+    private List<Bitmap> convertByteBufferToColorBitmapList(ByteBuffer byteBuffer, int width, int height) {
+        List<Bitmap> bitmapMaskList = new ArrayList<>();
+        byteBuffer.rewind();
+        byteBuffer.order(ByteOrder.nativeOrder());
+        int[] pixels = new int[SIZE_X * SIZE_Y];
+        for (int c = 0; c < batchSize; c++) {
+            for (int i = 0; i < SIZE_X * SIZE_Y; i++) {
+                float maxColorProbability = 0;
+                int pixelColor = Color.argb(0, 0, 0, 0);
+                for (int z = 0; z < OUTPUT_CLASS_COUNT; z++) {
+                    float colorProbability = (byteBuffer.getFloat() / 100);
+                    if (colorProbability > maxColorProbability && colorProbability > GOOD_PROB_THRESHOLD) {
+                        maxColorProbability = colorProbability;
+                        pixelColor = colors[z % colors.length];
+                    }
+                }
+                pixels[i] = pixelColor;
+            }
+        }
+        Bitmap bitmap = Bitmap.createBitmap(SIZE_X, SIZE_Y, Bitmap.Config.ARGB_4444);
+        bitmap.setPixels(pixels, 0, SIZE_X, 0, 0, SIZE_X, SIZE_Y);
+
+        Bitmap segmentationMask = Bitmap.createScaledBitmap(bitmap, width, height, true);
+        bitmapMaskList.add(segmentationMask);
+
         log.log("Byte buffer converted to the Bitmaps. (Segmentation masks are converted to the Bitmaps)");
         return bitmapMaskList;
     }
