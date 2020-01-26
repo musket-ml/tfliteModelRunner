@@ -1,10 +1,11 @@
 # TensorFlow Lite Model Runner
 
-Android application for testing tenorflow lite models.
+Android application for testing TensorFlow lite models.
 
 Now supported:
  - Classification models. Only photo classification.
  - Segmentation models. Photo and video segmentation.
+ - Object detection models. Only photo object detection.
 
 The application has a demo segmentation model.
 
