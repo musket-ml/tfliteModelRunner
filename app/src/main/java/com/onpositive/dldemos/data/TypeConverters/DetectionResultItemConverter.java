@@ -20,11 +20,11 @@ public class DetectionResultItemConverter {
     public static final String LEFT = "left";
 
     @TypeConverter
-    public String fromRecognitionList(List<ImageDetector.ObjectDetection> list) {
+    public String fromRecognitionList(List<ImageDetector.Prediction> list) {
         String json = "";
         JSONArray jsonArray = new JSONArray();
         try {
-            for (ImageDetector.ObjectDetection recognition : list) {
+            for (ImageDetector.Prediction recognition : list) {
                 JSONObject object = new JSONObject();
                 object.put(recognition.getTitle(), recognition.getConfidence());
                 object.put(LEFT, recognition.getLocation().left);
@@ -40,8 +40,8 @@ public class DetectionResultItemConverter {
     }
 
     @TypeConverter
-    public List<ImageDetector.ObjectDetection> toRecognitionList(String str) {
-        List<ImageDetector.ObjectDetection> recognitions = new ArrayList<>();
+    public List<ImageDetector.Prediction> toRecognitionList(String str) {
+        List<ImageDetector.Prediction> recognitions = new ArrayList<>();
         try {
             JSONArray jsonArray = new JSONArray(str);
             for (int i = 0; i < jsonArray.length(); i++) {
@@ -54,7 +54,7 @@ public class DetectionResultItemConverter {
                         (float) object.getDouble(RIGHT),
                         (float) object.getDouble(BOTTOM)
                 );
-                recognitions.add(new ImageDetector.ObjectDetection(key, value, location));
+                recognitions.add(new ImageDetector.Prediction(key, value, location));
 
             }
         } catch (JSONException e) {

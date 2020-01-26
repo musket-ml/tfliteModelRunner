@@ -101,7 +101,7 @@ public class DetectionRVAdapter extends RecyclerView.Adapter<DetectionRVAdapter.
     @Override
     public void onBindViewHolder(DetectionRVAdapter.ViewHolder holder, int position) {
         DetectionResultItem item = (DetectionResultItem) itemList.get(position);
-        ImageDetector.ObjectDetection detection = item.getRecognitionResultList().get(0);
+        ImageDetector.Prediction detection = item.getRecognitionResultList().get(0);
         holder.fileNameTV.setText(item.getFileName());
         if (null != detection) {
             holder.infoTV.setVisibility(View.VISIBLE);

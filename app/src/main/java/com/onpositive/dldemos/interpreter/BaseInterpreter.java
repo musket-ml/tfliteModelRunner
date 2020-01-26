@@ -50,7 +50,7 @@ public abstract class BaseInterpreter {
         SIZE_Y = tfLiteItem.getSize_y();
         this.tfliteModel = loadModelFile(activity.getAssets(), tfLiteItem);
         if (tfLiteItem.hasLabels()) {
-            labels = loadLabelList(activity);
+            labels = loadLabelList();
             labelProbArray = new byte[1][getNumLabels()];
         }
         useGPU();
@@ -59,8 +59,12 @@ public abstract class BaseInterpreter {
         log.log(this.getClass().getSimpleName() + " initialized.");
     }
 
-//    protected abstract void runInference();
-
+    /**
+     * Converts Bitmap to the ByteBuffer
+     *
+     * @param bitmap Bitmap for prediction.
+     * @return Input ByteBuffer for Interpreter
+     */
     protected ByteBuffer convertBitmapToByteBuffer(Bitmap bitmap) {
         ByteBuffer imgData = ByteBuffer.allocateDirect(BATCH_SIZE * SIZE_X * SIZE_Y * PIXEL_SIZE);
         imgData.order(ByteOrder.nativeOrder());
@@ -82,6 +86,12 @@ public abstract class BaseInterpreter {
         return imgData;
     }
 
+    /**
+     * Converts Bitmap List to the ByteBuffer
+     *
+     * @param bitmapList List of Bitmap for prediction.
+     * @return Input ByteBuffer for Interpreter
+     */
     protected ByteBuffer convertBitmapListToByteBuffer(List<Bitmap> bitmapList) {
         ByteBuffer byteBuffer = ByteBuffer.allocateDirect(4 * BATCH_SIZE * SIZE_X * SIZE_Y * PIXEL_SIZE);
         byteBuffer.order(ByteOrder.nativeOrder());
@@ -122,6 +132,12 @@ public abstract class BaseInterpreter {
         return labels.size();
     }
 
+    /**
+     * Loads tensorflow-lite model file from assets or from the disk.
+     *
+     * @param model TFLiteItem with a model data
+     * @return ByteBuffer for Interpreter
+     */
     private MappedByteBuffer loadModelFile(AssetManager assetManager, TFLiteItem model) throws IOException {
         MappedByteBuffer byteBuffer;
         FileInputStream inputStream;
@@ -141,7 +157,13 @@ public abstract class BaseInterpreter {
         return byteBuffer;
     }
 
-    private List<String> loadLabelList(Activity activity) throws IOException {
+    /**
+     * Load model labels for predictions.
+     *
+     * @return List of labels for predictions.
+     * @throws IOException on file read
+     */
+    private List<String> loadLabelList() throws IOException {
         List<String> labels = new ArrayList<String>();
         BufferedReader reader =
                 new BufferedReader(new InputStreamReader(new FileInputStream(tfLiteItem.getLabelsPath())));
@@ -201,6 +223,9 @@ public abstract class BaseInterpreter {
         log.log("NNAPI enabled");
     }
 
+    /**
+     * Stores prediction result item.
+     */
     public static class Prediction implements Comparable<Prediction> {
 
         private final String title;

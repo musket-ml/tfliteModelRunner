@@ -5,8 +5,6 @@ import android.graphics.Bitmap;
 import android.os.SystemClock;
 import android.os.Trace;
 
-import androidx.annotation.NonNull;
-
 import com.onpositive.dldemos.data.TFLiteItem;
 import com.onpositive.dldemos.interpreter.BaseInterpreter;
 
@@ -26,7 +24,7 @@ public class ImageClassifier extends BaseInterpreter {
         log.log(this.getClass().getSimpleName() + " initialized.");
     }
 
-    public List<Classification> recognizeImage(final Bitmap bitmap) {
+    public List<Prediction> recognizeImage(final Bitmap bitmap) {
         Trace.beginSection("recognizeImage");
 
         Trace.beginSection("preprocessBitmap");
@@ -41,71 +39,32 @@ public class ImageClassifier extends BaseInterpreter {
         Trace.endSection();
         log.log("Timecost to run model inference: " + (endTime - startTime));
 
-        PriorityQueue<Classification> pq =
-                new PriorityQueue<Classification>(
+        PriorityQueue<Prediction> pq =
+                new PriorityQueue<Prediction>(
                         3,
-                        new Comparator<Classification>() {
+                        new Comparator<Prediction>() {
                             @Override
-                            public int compare(Classification lhs, Classification rhs) {
+                            public int compare(Prediction lhs, Prediction rhs) {
                                 return Float.compare(rhs.getConfidence(), lhs.getConfidence());
                             }
                         });
         for (int i = 0; i < labels.size(); ++i) {
             pq.add(
-                    new Classification(
+                    new Prediction(
                             labels.size() > i ? labels.get(i) : "unknown",
                             getNormalizedProbability(i)));
         }
-        final ArrayList<Classification> recognitions = new ArrayList<Classification>();
+        final ArrayList<Prediction> recognitions = new ArrayList<Prediction>();
         int recognitionsSize = Math.min(pq.size(), MAX_RESULTS);
         for (int i = 0; i < recognitionsSize; ++i) {
             recognitions.add(pq.poll());
         }
         Trace.endSection();
-        log.log("Classification successful. Results count: " + recognitions.size());
+        log.log("Prediction successful. Results count: " + recognitions.size());
         return recognitions;
     }
 
     protected void runInference() {
         interpreter.run(imgData, labelProbArray);
-    }
-
-    public static class Classification implements Comparable<Classification> {
-
-        private final String title;
-        private final Float confidence;
-
-        public Classification(final String title, final Float confidence) {
-            this.title = title;
-            this.confidence = confidence;
-        }
-
-        public String getTitle() {
-            return title;
-        }
-
-        public Float getConfidence() {
-            return confidence;
-        }
-
-        @Override
-        public String toString() {
-            String resultString = "";
-
-            if (title != null) {
-                resultString += title + " ";
-            }
-
-            if (confidence != null) {
-                resultString += String.format("(%.1f%%) ", confidence * 100.0f);
-            }
-
-            return resultString.trim();
-        }
-
-        @Override
-        public int compareTo(@NonNull Classification o) {
-            return this.confidence.compareTo(o.confidence);
-        }
     }
 }

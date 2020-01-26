@@ -56,11 +56,11 @@ public class ClassifyResultItemFragment extends Fragment {
         listRV.setLayoutManager(new LinearLayoutManager(this.getContext()));
         listRV.setItemAnimator(itemAnimator);
         try {
-            rvListAdapter = new RecyclerViewListAdapter(resultItem.getClassificationResultList());
+            rvListAdapter = new RecyclerViewListAdapter(resultItem.getPredictionResultList());
             listRV.setAdapter(rvListAdapter);
-            log.log("Classification results were uploaded");
+            log.log("Prediction results were uploaded");
         } catch (Exception e) {
-            log.log("Classification results upload failed: " + e.getMessage());
+            log.log("Prediction results upload failed: " + e.getMessage());
         }
         return rootView;
     }

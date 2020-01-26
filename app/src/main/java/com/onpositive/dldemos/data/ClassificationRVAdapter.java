@@ -101,11 +101,11 @@ public class ClassificationRVAdapter extends RecyclerView.Adapter<Classification
     @Override
     public void onBindViewHolder(ClassificationRVAdapter.ViewHolder holder, int position) {
         ClassificationResultItem item = (ClassificationResultItem) itemList.get(position);
-        ImageClassifier.Classification classification = item.getClassificationResultList().get(0);
+        ImageClassifier.Prediction prediction = item.getPredictionResultList().get(0);
         holder.fileNameTV.setText(item.getFileName());
-        if (null != classification) {
+        if (null != prediction) {
             holder.infoTV.setVisibility(View.VISIBLE);
-            holder.infoTV.setText(classification.toString());
+            holder.infoTV.setText(prediction.toString());
         }
         RequestOptions requestOptions = new RequestOptions()
                 .diskCacheStrategy(DiskCacheStrategy.ALL)

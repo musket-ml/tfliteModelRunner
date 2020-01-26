@@ -43,14 +43,14 @@ public class ClassificationAsyncTask extends AsyncTask<ContentType, Integer, Cla
                 try {
                     resultImageFile = Utils.createImageFile(fragment.getActivity());
                     FileOutputStream stream = new FileOutputStream(resultImageFile);
-                    List<ImageClassifier.Classification> classificationList = classifier.recognizeImage(BitmapFactory.decodeFile(fragment.getCurrentPhotoPath()));
+                    List<ImageClassifier.Prediction> predictionList = classifier.recognizeImage(BitmapFactory.decodeFile(fragment.getCurrentPhotoPath()));
                     BitmapFactory.decodeFile(fragment.getCurrentPhotoPath()).compress(Bitmap.CompressFormat.JPEG, 100, stream);
                     stream.flush();
                     stream.close();
                     String thumbnailPath = Utils.createThumbnail(fragment.getActivity(), resultImageFile.getAbsolutePath(), ContentType.IMAGE);
                     classificationRI = new ClassificationResultItem(resultImageFile.getAbsolutePath(), ContentType.IMAGE, thumbnailPath);
-                    Collections.sort(classificationList);
-                    classificationRI.setClassificationResultList(classificationList);
+                    Collections.sort(predictionList);
+                    classificationRI.setPredictionResultList(predictionList);
                     deleteFile(new File(fragment.getCurrentPhotoPath()));
                     log.log("Image classified successfully. Image file path:" + resultImageFile.getAbsolutePath());
                 } catch (Exception e) {
@@ -70,7 +70,7 @@ public class ClassificationAsyncTask extends AsyncTask<ContentType, Integer, Cla
         fragment.progressBar.setVisibility(View.VISIBLE);
         fragment.progressStatusTV.setText(R.string.calculating);
         fragment.progressStatusTV.setVisibility(View.VISIBLE);
-        log.log("Classification Async Task onPreExecute");
+        log.log("Prediction Async Task onPreExecute");
     }
 
     @Override

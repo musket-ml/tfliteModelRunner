@@ -36,7 +36,7 @@ public class ImageDetector extends BaseInterpreter {
         log.log(this.getClass().getSimpleName() + " initialized.");
     }
 
-    public List<ObjectDetection> recognizeImage(final Bitmap bitmap) {
+    public List<Prediction> recognizeImage(final Bitmap bitmap) {
         Trace.beginSection("recognizeImage");
 
         Trace.beginSection("preprocessBitmap");
@@ -51,7 +51,7 @@ public class ImageDetector extends BaseInterpreter {
         Trace.endSection();
         log.log("Time cost to run model inference: " + (endTime - startTime));
 
-        final ArrayList<ObjectDetection> recognitions = new ArrayList<>(MAX_RESULTS);
+        final ArrayList<Prediction> recognitions = new ArrayList<>(MAX_RESULTS);
         for (int i = 0; i < MAX_RESULTS; ++i) {
             final RectF detection =
                     new RectF(
@@ -64,13 +64,13 @@ public class ImageDetector extends BaseInterpreter {
             // while outputClasses correspond to class index from 0 to number_of_classes
             int labelOffset = 0;
             recognitions.add(
-                    new ObjectDetection(
+                    new Prediction(
                             labels.get((int) outputClasses[0][i] + labelOffset),
                             outputScores[0][i],
                             detection));
         }
         Trace.endSection(); // "recognizeImage"
-        log.log("ObjectDetection successful. Results count: " + recognitions.size());
+        log.log("Prediction successful. Results count: " + recognitions.size());
         return recognitions;
     }
 
@@ -88,54 +88,5 @@ public class ImageDetector extends BaseInterpreter {
         outputMap.put(3, numDetections);
 
         interpreter.runForMultipleInputsOutputs(inputArray, outputMap);
-    }
-
-    public static class ObjectDetection implements Comparable<ObjectDetection> {
-
-        private final String title;
-        private final Float confidence;
-        private RectF location;
-
-        public ObjectDetection(final String title, final Float confidence, final RectF location) {
-            this.title = title;
-            this.confidence = confidence;
-            this.location = location;
-        }
-
-        public String getTitle() {
-            return title;
-        }
-
-        public Float getConfidence() {
-            return confidence;
-        }
-
-        public RectF getLocation() {
-            return new RectF(location);
-        }
-
-        public void setLocation(RectF location) {
-            this.location = location;
-        }
-
-        @Override
-        public String toString() {
-            String resultString = "";
-
-            if (title != null) {
-                resultString += title + " ";
-            }
-
-            if (confidence != null) {
-                resultString += String.format("(%.1f%%) ", confidence * 100.0f);
-            }
-
-            return resultString.trim();
-        }
-
-        @Override
-        public int compareTo(ObjectDetection objectDetection) {
-            return this.confidence.compareTo(objectDetection.confidence);
-        }
     }
 }

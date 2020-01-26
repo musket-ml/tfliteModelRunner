@@ -22,18 +22,18 @@ public class RecyclerViewListAdapter extends RecyclerView.Adapter<RecyclerViewLi
 
     private static final float FILTER_VALUE = 0.5f;
     private static Logger log = new Logger(RecyclerViewListAdapter.class);
-    private List<ImageClassifier.Classification> classificationRIFilteredList;
+    private List<ImageClassifier.Prediction> predictionRIFilteredList;
 
-    public RecyclerViewListAdapter(List<ImageClassifier.Classification> classificationResultItemList) {
-        List<ImageClassifier.Classification> classificationFilteredList = new ArrayList<>();
-        Collections.sort(classificationResultItemList);
-        for (ImageClassifier.Classification classification : classificationResultItemList) {
-            if (classification.getConfidence() > FILTER_VALUE) {
-                classificationFilteredList.add(classification);
+    public RecyclerViewListAdapter(List<ImageClassifier.Prediction> predictionResultItemList) {
+        List<ImageClassifier.Prediction> predictionFilteredList = new ArrayList<>();
+        Collections.sort(predictionResultItemList);
+        for (ImageClassifier.Prediction prediction : predictionResultItemList) {
+            if (prediction.getConfidence() > FILTER_VALUE) {
+                predictionFilteredList.add(prediction);
             }
         }
-        Collections.reverse(classificationFilteredList);
-        this.classificationRIFilteredList = classificationFilteredList;
+        Collections.reverse(predictionFilteredList);
+        this.predictionRIFilteredList = predictionFilteredList;
         log.log("RecyclerViewListAdapter created");
     }
 
@@ -46,12 +46,12 @@ public class RecyclerViewListAdapter extends RecyclerView.Adapter<RecyclerViewLi
     @Override
     public void onBindViewHolder(ListItemHolder holder, int position) {
         holder.itemTV.setText(
-                classificationRIFilteredList.get(position).toString());
+                predictionRIFilteredList.get(position).toString());
     }
 
     @Override
     public int getItemCount() {
-        return classificationRIFilteredList.size();
+        return predictionRIFilteredList.size();
     }
 
     public class ListItemHolder extends RecyclerView.ViewHolder {

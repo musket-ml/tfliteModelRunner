@@ -14,7 +14,7 @@ import java.util.List;
 @TypeConverters({DetectionResultItemConverter.class, ResultItemConverter.class})
 public class DetectionResultItem extends ResultItem {
 
-    private List<ImageDetector.ObjectDetection> recognitionResultList;
+    private List<ImageDetector.Prediction> recognitionResultList;
 
     public DetectionResultItem() {
     }
@@ -23,13 +23,13 @@ public class DetectionResultItem extends ResultItem {
         super(filePath, ct, thumbnailPath);
     }
 
-    public List<ImageDetector.ObjectDetection> getRecognitionResultList() {
+    public List<ImageDetector.Prediction> getRecognitionResultList() {
         Collections.sort(recognitionResultList);
         Collections.reverse(recognitionResultList);
         return this.recognitionResultList;
     }
 
-    public void setRecognitionResultList(List<ImageDetector.ObjectDetection> recognitionResultList) {
+    public void setRecognitionResultList(List<ImageDetector.Prediction> recognitionResultList) {
         this.recognitionResultList = recognitionResultList;
     }
 }

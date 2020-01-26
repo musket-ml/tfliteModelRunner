@@ -64,7 +64,7 @@ public class DetectionAsyncTask extends AsyncTask<ContentType, Integer, Detectio
                 contentType = ContentType.IMAGE;
                 File resultImageFile = null;
                 try {
-                    List<ImageDetector.ObjectDetection> recognitions = detector.recognizeImage(BitmapFactory.decodeFile(fragment.getCurrentPhotoPath()));
+                    List<ImageDetector.Prediction> recognitions = detector.recognizeImage(BitmapFactory.decodeFile(fragment.getCurrentPhotoPath()));
                     resultImageFile = Utils.createImageFile(fragment.getActivity());
                     FileOutputStream stream = new FileOutputStream(resultImageFile);
                     drawRecognitions(BitmapFactory.decodeFile(fragment.getCurrentPhotoPath()), recognitions)
@@ -138,7 +138,7 @@ public class DetectionAsyncTask extends AsyncTask<ContentType, Integer, Detectio
         log.log("Object Detection results are saved");
     }
 
-    private Bitmap drawRecognitions(Bitmap bitmap, List<ImageDetector.ObjectDetection> recognitions) {
+    private Bitmap drawRecognitions(Bitmap bitmap, List<ImageDetector.Prediction> recognitions) {
         Bitmap recognitionBitmap = bitmap.copy(Bitmap.Config.ARGB_8888, true);
         Canvas canvas = new Canvas(recognitionBitmap);
         float textSizePx =
@@ -159,7 +159,7 @@ public class DetectionAsyncTask extends AsyncTask<ContentType, Integer, Detectio
         textPaint.setAntiAlias(false);
         textPaint.setAlpha(255);
 
-        for (ImageDetector.ObjectDetection recognition : recognitions) {
+        for (ImageDetector.Prediction recognition : recognitions) {
             int colorNumber = recognitions.indexOf(recognition) % COLORS.length;
             int color = COLORS[colorNumber];
             paint.setColor(color);

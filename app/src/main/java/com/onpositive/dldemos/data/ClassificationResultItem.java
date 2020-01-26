@@ -15,7 +15,7 @@ import java.util.List;
 @TypeConverters({ClassificationResultItemConverter.class, ResultItemConverter.class})
 public class ClassificationResultItem extends ResultItem {
 
-    private List<ImageClassifier.Classification> classificationResultList = new ArrayList<>();
+    private List<ImageClassifier.Prediction> predictionResultList = new ArrayList<>();
 
     public ClassificationResultItem() {
     }
@@ -24,13 +24,13 @@ public class ClassificationResultItem extends ResultItem {
         super(filePath, ct, thumbnailPath);
     }
 
-    public List<ImageClassifier.Classification> getClassificationResultList() {
-        Collections.sort(classificationResultList);
-        Collections.reverse(classificationResultList);
-        return classificationResultList;
+    public List<ImageClassifier.Prediction> getPredictionResultList() {
+        Collections.sort(predictionResultList);
+        Collections.reverse(predictionResultList);
+        return predictionResultList;
     }
 
-    public void setClassificationResultList(List<ImageClassifier.Classification> classificationResultList) {
-        this.classificationResultList = classificationResultList;
+    public void setPredictionResultList(List<ImageClassifier.Prediction> predictionResultList) {
+        this.predictionResultList = predictionResultList;
     }
 }
