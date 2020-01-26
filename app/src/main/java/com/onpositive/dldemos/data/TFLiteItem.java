@@ -45,6 +45,15 @@ public class TFLiteItem {
         this.size_y = height;
     }
 
+    public boolean hasLabels() {
+        if (this.labelsPath.length() > 0) {
+            return true;
+        } else {
+            return false;
+        }
+
+    }
+
     public String getTfFilePath() {
         return tfFilePath;
     }
