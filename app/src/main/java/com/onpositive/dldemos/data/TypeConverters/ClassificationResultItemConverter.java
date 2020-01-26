@@ -2,7 +2,7 @@ package com.onpositive.dldemos.data.TypeConverters;
 
 import androidx.room.TypeConverter;
 
-import com.onpositive.dldemos.classification.ImageClassifier;
+import com.onpositive.dldemos.interpreter.ImageClassifier;
 
 import org.json.JSONArray;
 import org.json.JSONException;

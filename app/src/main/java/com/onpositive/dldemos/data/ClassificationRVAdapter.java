@@ -20,7 +20,7 @@ import com.bumptech.glide.request.RequestOptions;
 import com.onpositive.dldemos.ClassifyResultItemFragment;
 import com.onpositive.dldemos.MLDemoApp;
 import com.onpositive.dldemos.R;
-import com.onpositive.dldemos.classification.ImageClassifier;
+import com.onpositive.dldemos.interpreter.ImageClassifier;
 import com.onpositive.dldemos.tools.Logger;
 
 import java.io.File;

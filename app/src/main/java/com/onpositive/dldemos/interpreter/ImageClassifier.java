@@ -1,4 +1,4 @@
-package com.onpositive.dldemos.classification;
+package com.onpositive.dldemos.interpreter;
 
 import android.app.Activity;
 import android.graphics.Bitmap;
@@ -6,7 +6,6 @@ import android.os.SystemClock;
 import android.os.Trace;
 
 import com.onpositive.dldemos.data.TFLiteItem;
-import com.onpositive.dldemos.interpreter.BaseInterpreter;
 
 import java.io.IOException;
 import java.nio.ByteBuffer;

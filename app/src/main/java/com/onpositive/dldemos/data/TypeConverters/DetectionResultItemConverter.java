@@ -4,7 +4,7 @@ import android.graphics.RectF;
 
 import androidx.room.TypeConverter;
 
-import com.onpositive.dldemos.detection.ImageDetector;
+import com.onpositive.dldemos.interpreter.ImageDetector;
 
 import org.json.JSONArray;
 import org.json.JSONException;

@@ -14,7 +14,7 @@ import androidx.annotation.Nullable;
 import com.onpositive.dldemos.data.ContentType;
 import com.onpositive.dldemos.data.DetectionResultItem;
 import com.onpositive.dldemos.data.DetectionResultItemDao;
-import com.onpositive.dldemos.detection.ImageDetector;
+import com.onpositive.dldemos.interpreter.ImageDetector;
 import com.onpositive.dldemos.tools.Logger;
 import com.onpositive.dldemos.tools.Utils;
 

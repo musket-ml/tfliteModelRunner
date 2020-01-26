@@ -1,4 +1,4 @@
-package com.onpositive.dldemos.segmentation;
+package com.onpositive.dldemos.interpreter;
 
 import org.tensorflow.lite.Delegate;
 

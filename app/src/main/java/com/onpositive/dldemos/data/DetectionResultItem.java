@@ -5,7 +5,7 @@ import androidx.room.TypeConverters;
 
 import com.onpositive.dldemos.data.TypeConverters.DetectionResultItemConverter;
 import com.onpositive.dldemos.data.TypeConverters.ResultItemConverter;
-import com.onpositive.dldemos.detection.ImageDetector;
+import com.onpositive.dldemos.interpreter.ImageDetector;
 
 import java.util.Collections;
 import java.util.List;

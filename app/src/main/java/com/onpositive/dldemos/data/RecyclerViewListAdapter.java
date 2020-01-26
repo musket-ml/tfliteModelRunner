@@ -8,7 +8,7 @@ import android.widget.TextView;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.onpositive.dldemos.R;
-import com.onpositive.dldemos.classification.ImageClassifier;
+import com.onpositive.dldemos.interpreter.ImageClassifier;
 import com.onpositive.dldemos.tools.Logger;
 
 import java.util.ArrayList;

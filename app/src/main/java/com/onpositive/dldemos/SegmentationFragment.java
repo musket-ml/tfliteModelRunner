@@ -30,8 +30,8 @@ import com.onpositive.dldemos.data.RecyclerViewAdapter;
 import com.onpositive.dldemos.data.ResultItem;
 import com.onpositive.dldemos.data.ResultItemDao;
 import com.onpositive.dldemos.data.TFLiteItem;
-import com.onpositive.dldemos.segmentation.Segmentator;
-import com.onpositive.dldemos.segmentation.VideoSegmentator;
+import com.onpositive.dldemos.interpreter.Segmentator;
+import com.onpositive.dldemos.interpreter.VideoSegmentator;
 import com.onpositive.dldemos.tools.Logger;
 import com.onpositive.dldemos.tools.Utils;
 

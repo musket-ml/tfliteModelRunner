@@ -25,13 +25,13 @@ import androidx.recyclerview.widget.DefaultItemAnimator;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.onpositive.dldemos.classification.ImageClassifier;
 import com.onpositive.dldemos.data.ClassificationRVAdapter;
 import com.onpositive.dldemos.data.ClassificationResultItem;
 import com.onpositive.dldemos.data.ClassificationResultItemDao;
 import com.onpositive.dldemos.data.ContentType;
 import com.onpositive.dldemos.data.ResultItem;
 import com.onpositive.dldemos.data.TFLiteItem;
+import com.onpositive.dldemos.interpreter.ImageClassifier;
 import com.onpositive.dldemos.tools.Logger;
 import com.onpositive.dldemos.tools.Utils;
 

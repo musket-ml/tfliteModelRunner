@@ -1,4 +1,4 @@
-package com.onpositive.dldemos.segmentation;
+package com.onpositive.dldemos.interpreter;
 
 import android.app.Activity;
 import android.graphics.Bitmap;
@@ -12,7 +12,6 @@ import androidx.core.content.ContextCompat;
 
 import com.onpositive.dldemos.R;
 import com.onpositive.dldemos.data.TFLiteItem;
-import com.onpositive.dldemos.interpreter.BaseInterpreter;
 
 import java.io.IOException;
 import java.nio.ByteBuffer;

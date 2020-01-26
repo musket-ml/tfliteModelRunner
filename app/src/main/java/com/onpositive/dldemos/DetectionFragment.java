@@ -31,7 +31,7 @@ import com.onpositive.dldemos.data.DetectionResultItem;
 import com.onpositive.dldemos.data.DetectionResultItemDao;
 import com.onpositive.dldemos.data.ResultItem;
 import com.onpositive.dldemos.data.TFLiteItem;
-import com.onpositive.dldemos.detection.ImageDetector;
+import com.onpositive.dldemos.interpreter.ImageDetector;
 import com.onpositive.dldemos.tools.Logger;
 import com.onpositive.dldemos.tools.Utils;
 

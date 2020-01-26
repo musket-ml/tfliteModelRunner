@@ -7,10 +7,10 @@ import android.view.View;
 
 import androidx.annotation.Nullable;
 
-import com.onpositive.dldemos.classification.ImageClassifier;
 import com.onpositive.dldemos.data.ClassificationResultItem;
 import com.onpositive.dldemos.data.ClassificationResultItemDao;
 import com.onpositive.dldemos.data.ContentType;
+import com.onpositive.dldemos.interpreter.ImageClassifier;
 import com.onpositive.dldemos.tools.Logger;
 import com.onpositive.dldemos.tools.Utils;
 

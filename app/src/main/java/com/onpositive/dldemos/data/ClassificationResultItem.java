@@ -3,9 +3,9 @@ package com.onpositive.dldemos.data;
 import androidx.room.Entity;
 import androidx.room.TypeConverters;
 
-import com.onpositive.dldemos.classification.ImageClassifier;
 import com.onpositive.dldemos.data.TypeConverters.ClassificationResultItemConverter;
 import com.onpositive.dldemos.data.TypeConverters.ResultItemConverter;
+import com.onpositive.dldemos.interpreter.ImageClassifier;
 
 import java.util.ArrayList;
 import java.util.Collections;

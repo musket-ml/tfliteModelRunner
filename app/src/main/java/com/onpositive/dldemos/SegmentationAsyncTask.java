@@ -9,7 +9,7 @@ import androidx.annotation.Nullable;
 import com.onpositive.dldemos.data.ContentType;
 import com.onpositive.dldemos.data.ResultItem;
 import com.onpositive.dldemos.data.ResultItemDao;
-import com.onpositive.dldemos.segmentation.Segmentator;
+import com.onpositive.dldemos.interpreter.Segmentator;
 import com.onpositive.dldemos.tools.Logger;
 import com.onpositive.dldemos.tools.Utils;
 

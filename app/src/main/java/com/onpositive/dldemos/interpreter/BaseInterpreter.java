@@ -10,7 +10,6 @@ import android.os.SystemClock;
 import androidx.annotation.NonNull;
 
 import com.onpositive.dldemos.data.TFLiteItem;
-import com.onpositive.dldemos.segmentation.GpuDelegateHelper;
 import com.onpositive.dldemos.tools.Logger;
 
 import org.tensorflow.lite.Interpreter;
