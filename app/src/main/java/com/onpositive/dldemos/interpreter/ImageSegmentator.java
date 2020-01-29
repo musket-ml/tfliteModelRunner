@@ -43,7 +43,7 @@ public abstract class ImageSegmentator extends BaseInterpreter implements Segmen
             Color.parseColor("#88232C16"), // Dark Olive Green
             Color.parseColor("#8800A1C2")  // Vivid Blue
     };
-    private final double GOOD_PROB_THRESHOLD = 0.1;
+    private final double GOOD_PROB_THRESHOLD = 0.5;
     private int OUTPUT_CLASS_COUNT = 1;
 
     public ImageSegmentator(Activity activity, @NonNull TFLiteItem tfLiteItem) throws IOException {
