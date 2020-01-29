@@ -21,7 +21,6 @@ import java.util.List;
 
 public abstract class ImageSegmentator extends BaseInterpreter implements Segmentator {
     public static final int[] colors = {
-            Color.argb(0, 0, 0, 0),
             Color.parseColor("#88FFB300"), // Vivid Yellow
             Color.parseColor("#88803E75"), // Strong Purple
             Color.parseColor("#88FF6800"), // Vivid Orange
@@ -140,7 +139,7 @@ public abstract class ImageSegmentator extends BaseInterpreter implements Segmen
                 float maxColorProbability = 0;
                 int pixelColor = Color.argb(0, 0, 0, 0);
                 for (int z = 0; z < OUTPUT_CLASS_COUNT; z++) {
-                    float colorProbability = (byteBuffer.getFloat() / 100);
+                    float colorProbability = byteBuffer.getFloat();
                     if (colorProbability > maxColorProbability && colorProbability > GOOD_PROB_THRESHOLD) {
                         maxColorProbability = colorProbability;
                         pixelColor = colors[z % colors.length];
