@@ -33,7 +33,7 @@ public class MLDemoApp extends Application {
                         new Thread(new Runnable() {
                             @Override
                             public void run() {
-                                TFLiteItem tfLiteItem = new TFLiteItem("segmentation_model_0.2_relu-1.13.0rc2.tflite",
+                                TFLiteItem tfLiteItem = new TFLiteItem("segmentation_model.tflite",
                                         getApplicationContext().getString(R.string.segmentation),
                                         true,
                                         TFModelType.SEGMENTATION,
