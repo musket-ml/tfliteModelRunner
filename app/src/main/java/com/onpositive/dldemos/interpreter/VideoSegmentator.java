@@ -20,10 +20,6 @@ import org.jcodec.common.model.Rational;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.LinkedList;
-import java.util.concurrent.Executors;
-import java.util.concurrent.Future;
-import java.util.concurrent.ThreadPoolExecutor;
 
 public class VideoSegmentator extends ImageSegmentator {
 
@@ -44,9 +40,6 @@ public class VideoSegmentator extends ImageSegmentator {
         File inputFile = new File(videoFilePath);
         boolean isCanceled = true;
         try {
-            ThreadPoolExecutor executor = (ThreadPoolExecutor) Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors() + 1);
-            LinkedList<Future<Bitmap>> futuresList = new LinkedList<>();
-            //TODO add waiting for a file read canRead() etc.
             grab = FrameGrab.createFrameGrab(NIOUtils.readableChannel(inputFile));
             Picture picture;
 
@@ -54,8 +47,7 @@ public class VideoSegmentator extends ImageSegmentator {
             DemuxerTrackMeta dtm = grab.getVideoTrack().getMeta();
             AndroidSequenceEncoder encoder = new AndroidSequenceEncoder(videoOut, Rational.R1((int) (dtm.getTotalFrames() / dtm.getTotalDuration())));
 
-            Matrix matrix = new Matrix();
-            matrix.postRotate(-90);
+            Matrix matrix = getFrameMatrix(dtm);
             while (null != (picture = grab.getNativeFrame())) {
                 int frameSegStart = (int) System.currentTimeMillis();
                 processedFrameCount++;
@@ -92,6 +84,25 @@ public class VideoSegmentator extends ImageSegmentator {
                 + "\nFrame count: " + processedFrameCount
                 + "\nTime per frame: " + segmentationTime / processedFrameCount);
         return segmentedVideoPath;
+    }
+
+    private Matrix getFrameMatrix(DemuxerTrackMeta dtm) {
+        Matrix matrix = new Matrix();
+        switch (dtm.getOrientation()) {
+            case D_90:
+                matrix.postRotate(90);
+                break;
+            case D_180:
+                matrix.postRotate(180);
+                break;
+            case D_270:
+                matrix.postRotate(270);
+                break;
+            default:
+                matrix.postRotate(0);
+                break;
+        }
+        return matrix;
     }
 
     public void setProgressListener(ProgressListener progressListener) {
