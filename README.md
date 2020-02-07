@@ -11,6 +11,10 @@ The application has a demo segmentation model.
 
 ![](/media/tf-model-runner_small.gif)
 
+## Installation
+
+Download and install [TFLiteModelRunner apk file](https://github.com/musket-ml/tfliteModelRunner/raw/master/apk/release/tflite_runner_release_1.01.apk) on your android device.
+
 ## Usage
 
 Only TensorFlow light models are applicable. To convert a TensorFlow model to a TensorFlow light model see [guide.](https://www.tensorflow.org/lite/guide/get_started#2_convert_the_model_format)
