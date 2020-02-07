@@ -16,7 +16,6 @@ import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
 import androidx.core.content.FileProvider;
 import androidx.fragment.app.Fragment;
-import androidx.recyclerview.widget.RecyclerView;
 
 import com.onpositive.dldemos.data.ResultItem;
 import com.onpositive.dldemos.data.TFLiteItem;
@@ -41,6 +40,7 @@ public abstract class TFModelFragment extends Fragment {
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        setRetainInstance(true);
         setHasOptionsMenu(true);
         log.log("onCreate executed");
     }
@@ -88,7 +88,7 @@ public abstract class TFModelFragment extends Fragment {
         }
     }
 
-    void dispatchTakeVideoIntent() {
+    private void dispatchTakeVideoIntent() {
         File videoFile = null;
         try {
             videoFile = Utils.createVideoFile(getActivity());
@@ -108,7 +108,7 @@ public abstract class TFModelFragment extends Fragment {
         }
     }
 
-    void dispatchTakePictureIntent() {
+    private void dispatchTakePictureIntent() {
         File photoFile = null;
         try {
             photoFile = Utils.createImageFile(getActivity());
@@ -179,14 +179,14 @@ public abstract class TFModelFragment extends Fragment {
     }
 
 
-    public void moveRVDown(RecyclerView rv) {
-        setMargins(rv, 8, 56, 8, 0);
-        log.log("Recycler View moved down");
+    public void moveRVDown(View view) {
+        setMargins(view, 8, 56, 8, 0);
+        log.log("View moved down");
     }
 
-    public void moveRVUp(RecyclerView rv) {
-        setMargins(rv, 8, 8, 8, 0);
-        log.log("Recycler View moved up");
+    public void moveRVUp(View view) {
+        setMargins(view, 8, 8, 8, 0);
+        log.log("View moved up");
     }
 
     private void setMargins(View v, int l, int t, int r, int b) {
